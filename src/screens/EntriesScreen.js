@@ -4,7 +4,7 @@ import EntryList from "../components/screen_lists/EntryList";
 import {DBInterface} from "../utils/db/DBInterface";
 import {DBQueryHelper} from "../utils/db/DBQueryHelper";
 import BaseScreen from "./BaseScreen";
-import {TouchableOpacity} from "react-native";
+import {ActivityIndicator, TouchableOpacity} from "react-native";
 
 
 let isIos = require('react-native').Platform.OS === 'ios';
@@ -46,7 +46,7 @@ export default class EntriesScreen extends Component {
         DBQueryHelper.loginQuery()
             .then(l => {
                 this.setState({
-                    logins: l,
+                    logins: l
                 });
             });
     }

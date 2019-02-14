@@ -23,22 +23,22 @@ export default class EntryList extends Component {
     }
 
     componentDidMount() {
-        NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectionChange);
+        /*NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectionChange);
 
         NetInfo.isConnected.fetch().done(
             (isConnected) => {
                 this.state.status = isConnected
             }
-        );
+        );*/
     }
 
     componentWillUnmount() {
-        NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectionChange);
+        //NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectionChange);
     }
 
-    handleConnectionChange = (isConnected) => {
+    /*handleConnectionChange = (isConnected) => {
         this.state.status = isConnected;
-    };
+    };*/
 
     renderIcon(item)
     {
@@ -53,7 +53,7 @@ export default class EntryList extends Component {
         return(
             <Image
                 source={inactive}
-                style={{width: 25, height: 25}}
+                style={{width: 30, height: 30}}
             />);
     }
 

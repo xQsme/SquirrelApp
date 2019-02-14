@@ -43,10 +43,10 @@ export class DBInterface {
                 + '(5, "Fingerprint");', []);
 
             tx.executeSql('CREATE TABLE IF NOT EXISTS key ('
-                + 'id                INT(11) PRIMARY KEY NOT NULL, '
+                + 'id                INTEGER PRIMARY KEY, '
                 + 'id_login          INT(11) NOT NULL, '
                 + 'id_type           INT(11) NOT NULL, '
-                + 'active            INT(1) NOT NULL, '
+                + 'active            INT(1) DEFAULT 0, '
                 + 'FOREIGN KEY(id_login) REFERENCES login(id), '
                 + 'FOREIGN KEY(id_type) REFERENCES type(id) '
                 + ');', []);

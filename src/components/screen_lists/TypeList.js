@@ -12,13 +12,13 @@ import inactive from '../../utils/images/inactive.png';
  */
 let isIos = require('react-native').Platform.OS === 'ios';
 
-export default class KeyList extends Component {
+export default class TypeList extends Component {
 
 
     constructor(props) {
         super(props);
         this.state = {
-            keys: props.keys
+            types: props.types
         };
     }
 
@@ -40,23 +40,6 @@ export default class KeyList extends Component {
         this.state.status = isConnected;
     };
 
-    renderIcon(item)
-    {
-        if(item.active)
-        {
-            return(
-                <Image
-                    source={active}
-                    style={{width: 30, height: 30}}
-                />);
-        }
-        return(
-            <Image
-                source={inactive}
-                style={{width: 25, height: 25}}
-            />);
-    }
-
     renderRow(item) {
                 
         return (
@@ -68,26 +51,25 @@ export default class KeyList extends Component {
                         </Text>
                     </View>
                 }
-                rightContent={this.renderIcon(item)}
             />
         );
+    }
+
+    saveAnswer(item) {
+        this.props.onSelectAnswer(item);  
     }
 
     render() {
         return (
             <View style={{flex: 1}}>
                 <FlatList
-                    data={this.props.keys}
+                    data={this.props.types}
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({item}) =>
                         <ListItem style={{marginLeft: 0, paddingLeft: 15}}
                             onPress={() => {
-                                this.props.navigation.navigate('DetailsScreen', {
-                                    key: item,
-                                    onNavigateBack: this.props.onNavigateBack,
-                                })
+                                this.saveAnswer(item)
                             }}>
-
                             {this.renderRow(item)}
 
                         </ListItem>

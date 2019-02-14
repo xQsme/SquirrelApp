@@ -77,6 +77,7 @@ export const QuestionsListStyles = StyleSheet.create({
 
 export const ButtonStyles = StyleSheet.create({
     text: {color: 'rgb(0,0,0)'},
+    textConnect: {color: 'rgb(255,255,255)'},
     textAndroid: {color: 'rgb(0,122,255)'},
     textRed: {color: 'rgb(255,51,51)'},
     textAndroidRed: {color: 'rgb(255,51,51)'},
@@ -87,7 +88,25 @@ export const ButtonStyles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         backgroundColor : 'transparent',
-    }
+    },
+    buttonConnect: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgb(77, 195, 255)',
+        height: 40,
+        width: DEVICE_WIDTH - 40,
+        borderRadius: 20,
+        zIndex: 100,
+    },
+    buttonDisconnect: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgb(255,105,97)',
+        height: 40,
+        width: DEVICE_WIDTH - 40,
+        borderRadius: 20,
+        zIndex: 100,
+    },
 });
 
 export const SurveysListStyles = StyleSheet.create({

@@ -62,15 +62,14 @@ export class DBQueryHelper {
             });
     }
 
-    /*
-    static insertAnswer(temp_id, id_option)
+    static insertKey(login_id, id_type)
     {
         return new Promise(
             function (resolve, reject) {
                 let query =
-                    'INSERT OR REPLACE INTO answer_temp ' + 
-                    '(id_answered_survey_temp, id_option) ' +
-                    'VALUES (\"' + temp_id + '\" , \"' + id_option + '\");';
+                    'INSERT INTO key ' + 
+                    '(id_login, id_type) ' +
+                    'VALUES (\"' + login_id + '\" , \"' + id_type + '\");';
                 DBInterface.executeInsert(query)
                     .then(r => {
                         resolve(r);
@@ -78,16 +77,15 @@ export class DBQueryHelper {
                     reject(e);
                 });
             });
-            
     }
 
-    static updateScore(temp_id, score)
+    static updateLogin(login_id, value)
     {
         return new Promise(
             function (resolve, reject) {
-                let query = 'UPDATE answered_survey_temp ' + 
-                            'SET score = ' + score +
-                            ' WHERE id = ' + temp_id + ';';
+                let query = 'UPDATE login ' + 
+                            'SET active = ' + value +
+                            ' WHERE id = ' + login_id + ';';
                 DBInterface.executeInsert(query)
                     .then(res => {
                         resolve(res);
@@ -96,7 +94,7 @@ export class DBQueryHelper {
                 });
         });
     }
-
+   /*
     static deleteInfo(temp_id) {
         return new Promise(
             function (resolve, reject) {

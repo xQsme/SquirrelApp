@@ -2,8 +2,11 @@ import React, {Component} from 'react';
 import {HeaderBackButton} from "react-navigation";
 import {NetInfo, Text, TouchableOpacity, Image} from 'react-native';
 import BaseScreen from "./BaseScreen";
+import BaseScreenFooter from "./BaseScreenFooter";
 import {DBQueryHelper} from "../utils/db/DBQueryHelper";
 import KeyList from "../components/screen_lists/KeyList";
+import TypeList from "../components/screen_lists/TypeList";
+import {ButtonStyles, LoginScreenStyles} from "../utils/styles/Styles";
 import add from '../utils/images/add.png';
 
 export default class KeysScreen extends Component {
@@ -29,13 +32,13 @@ export default class KeysScreen extends Component {
 
     componentDidMount() {
         this.props.navigation.setParams({ handleSelect: this.selectType });
-        NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectionChange);
+        /*NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectionChange);
 
         NetInfo.isConnected.fetch().done(
             (isConnected) => {
                 this.state.status = isConnected
             }
-        );
+        );*/
     }
 
     componentWillUnmount() {
@@ -46,9 +49,10 @@ export default class KeysScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            login_id: this.props.navigation.state.params.login.id,
+            login: this.props.navigation.state.params.login,
             keys: [],
-            types: []
+            types: [],
+            picking: false
         };
 
         this.getKeys();
@@ -56,41 +60,94 @@ export default class KeysScreen extends Component {
 
     selectType = () =>
     {
-        console.log(this.state.types);
+        this.setState({
+            picking: !this.state.picking
+        })
     }
 
     getKeys()
     {
-        DBQueryHelper.keyQuery(this.state.login_id)
+        DBQueryHelper.keyQuery(this.state.login.id)
         .then(k => {
             DBQueryHelper.typeQuery()
             .then(t => {
                 this.setState({
                     keys: k,
-                    types: t
+                    types: t,
+                    picking: false
                 });
             });
         });
     }
 
-    handleConnectionChange = (isConnected) => {
+    /*handleConnectionChange = (isConnected) => {
         this.state.status = isConnected;
-    };
+    };*/
 
     render() {
-
+        if(this.state.picking)
+        {
+            return (
+                <BaseScreen
+                    content={
+                        <TypeList
+                            onSelectAnswer={this.handlePick}
+                            navigation={
+                                this.props.navigation
+                            }
+                            types={this.state.types}
+                        />
+                    }
+                />
+            );
+        }
         return (
-            <BaseScreen
+            <BaseScreenFooter
                 content={
                     <KeyList
+                        onNavigateBack={() => {
+                            this.getKeys();
+                        }}
                         navigation={
                             this.props.navigation
                         }
                         keys={this.state.keys}
                     />
                 }
+                footer={
+                    this.handleFooter()
+                }
             />
         );
+    }
+
+    handleFooter(){
+        return(
+        <TouchableOpacity style={this.state.login.active ? ButtonStyles.buttonDisconnect : ButtonStyles.buttonConnect}
+        onPress={() => {
+            this.handlePress();
+        }}>
+            <Text style={ButtonStyles.textConnect}>
+            {this.state.login.active ? "Disconnect" : "Connect"}
+            </Text>
+        </TouchableOpacity>);
+    }
+
+    handlePress()
+    {
+        DBQueryHelper.updateLogin(this.state.login.id, this.state.login.active ? 0 : 1).then(r =>{
+            let updatedLogin=this.state.login;
+            updatedLogin.active = !updatedLogin.active;
+            this.setState({
+                login: updatedLogin
+            })
+        });
+    }
+
+    handlePick = (p) => {
+        DBQueryHelper.insertKey(this.state.login.id, p.id).then(r =>{
+            this.getKeys();
+        });
     }
 
 }
