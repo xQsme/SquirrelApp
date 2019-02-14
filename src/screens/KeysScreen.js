@@ -101,8 +101,36 @@ export default class KeysScreen extends Component {
                 />
             );
         }
+        if(this.state.login.active)
+        {
+            return (
+                <BaseScreenFooter
+                    content={
+                        <KeyList
+                            onNavigateBack={() => {
+                                this.getKeys();
+                            }}
+                            navigation={
+                                this.props.navigation
+                            }
+                            keys={this.state.keys}
+                        />
+                    }
+                    footer={
+                        <TouchableOpacity style={ButtonStyles.buttonDisconnect}
+                            onPress={() => {
+                                this.handlePress();
+                            }}>
+                            <Text style={ButtonStyles.textConnect}>
+                                Disconnect
+                            </Text>
+                        </TouchableOpacity>
+                    }
+                />
+            );
+        }
         return (
-            <BaseScreenFooter
+            <BaseScreen
                 content={
                     <KeyList
                         onNavigateBack={() => {
@@ -114,30 +142,15 @@ export default class KeysScreen extends Component {
                         keys={this.state.keys}
                     />
                 }
-                footer={
-                    this.handleFooter()
-                }
             />
         );
     }
 
-    handleFooter(){
-        return(
-        <TouchableOpacity style={this.state.login.active ? ButtonStyles.buttonDisconnect : ButtonStyles.buttonConnect}
-        onPress={() => {
-            this.handlePress();
-        }}>
-            <Text style={ButtonStyles.textConnect}>
-            {this.state.login.active ? "Disconnect" : "Connect"}
-            </Text>
-        </TouchableOpacity>);
-    }
-
     handlePress()
     {
-        DBQueryHelper.updateLogin(this.state.login.id, this.state.login.active ? 0 : 1).then(r =>{
+        DBQueryHelper.updateLogin(this.state.login.id,  0).then(r =>{
             let updatedLogin=this.state.login;
-            updatedLogin.active = !updatedLogin.active;
+            updatedLogin.active = 0;
             this.setState({
                 login: updatedLogin
             })

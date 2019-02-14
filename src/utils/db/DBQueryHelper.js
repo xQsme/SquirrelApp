@@ -28,7 +28,7 @@ export class DBQueryHelper {
             function (resolve, reject) {
 
                 let query =
-                    'SELECT t.title as title, k.active as active FROM key k JOIN type t ON t.id = k.id_type ' + 
+                    'SELECT k.id as id, t.title as title, k.active as active FROM key k JOIN type t ON t.id = k.id_type ' + 
                     'WHERE k.id_login = ' + idLogin;
 
                 DBInterface.executeQuery(query)
@@ -86,6 +86,22 @@ export class DBQueryHelper {
                 let query = 'UPDATE login ' + 
                             'SET active = ' + value +
                             ' WHERE id = ' + login_id + ';';
+                DBInterface.executeInsert(query)
+                    .then(res => {
+                        resolve(res);
+                    }).catch((e) => {
+                    reject(e);
+                });
+        });
+    }
+
+    static updateKey(key_id, value)
+    {
+        return new Promise(
+            function (resolve, reject) {
+                let query = 'UPDATE key ' + 
+                            'SET active = ' + value +
+                            ' WHERE id = ' + key_id + ';';
                 DBInterface.executeInsert(query)
                     .then(res => {
                         resolve(res);

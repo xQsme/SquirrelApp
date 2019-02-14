@@ -53,7 +53,7 @@ export default class KeyList extends Component {
         return(
             <Image
                 source={inactive}
-                style={{width: 25, height: 25}}
+                style={{width: 30, height: 30}}
             />);
     }
 

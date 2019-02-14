@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import {HeaderBackButton} from "react-navigation";
-import {NetInfo, Text, TouchableOpacity, Image} from 'react-native';
-import BaseScreen from "./BaseScreen";
+import {View, NetInfo, Text, TouchableOpacity, Image} from 'react-native';
+import BaseScreenFooter from "./BaseScreenFooter";
 import {DBQueryHelper} from "../utils/db/DBQueryHelper";
+import {ButtonStyles} from "../utils/styles/Styles";
 
 export default class DetailsScreen extends Component {
 
@@ -35,7 +36,6 @@ export default class DetailsScreen extends Component {
         this.state = {
             key: this.props.navigation.state.params.key
         };
-
     }
 
 
@@ -46,12 +46,33 @@ export default class DetailsScreen extends Component {
 
     render() {
         return (
-            <BaseScreen
+            <BaseScreenFooter
                 content={
-                    <Text>Empty For Now</Text>
+                    <View></View>
+                }
+                footer={
+                    <TouchableOpacity style={this.state.key.active ? ButtonStyles.buttonDisconnect : ButtonStyles.buttonConnect}
+                        onPress={() => {
+                            this.handlePress();
+                        }}>
+                        <Text style={ButtonStyles.textConnect}>
+                            {this.state.key.active ? "Deactivate" : "Activate"}
+                        </Text>
+                    </TouchableOpacity>
                 }
             />
         );
+    }
+
+    handlePress()
+    {
+        DBQueryHelper.updateKey(this.state.key.id,  this.state.key.active ? 0 : 1).then(r =>{
+            let updatedKey=this.state.key;
+            updatedKey.active = !updatedKey.active;
+            this.setState({
+                key: updatedKey
+            })
+        });
     }
 
 }
