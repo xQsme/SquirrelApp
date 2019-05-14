@@ -115,8 +115,8 @@ export default class LoginScreen extends Component {
                                         }
                                     })).catch((e) => {
                                     Alert.alert(
-                                        'Erro',
-                                        "Erro ao inserir informação.",
+                                        'Error',
+                                        "Error inserting informaçation.",
                                         [
                                             {text: 'Ok'},
                                         ],
@@ -130,8 +130,8 @@ export default class LoginScreen extends Component {
                             })
                             .catch(e => {
                                 Alert.alert(
-                                    'Erro',
-                                    "Erro ao obter dados do servidor.",
+                                    'Error',
+                                    "Error obtaining data from server.",
                                     [
                                         {text: 'Ok'},
                                     ],
@@ -144,8 +144,8 @@ export default class LoginScreen extends Component {
                             });
                     } else {
                         Alert.alert(
-                            'Erro',
-                            "Não foi possível efetuar login.",
+                            'Error',
+                            "Login Failed.",
                             [
                                 {text: 'Ok'},
                             ],
@@ -158,8 +158,8 @@ export default class LoginScreen extends Component {
 
                 }).catch((error) => {
                 Alert.alert(
-                    'Erro',
-                    "Não foi possível efetuar login.",
+                    'Error',
+                    "Login Failed.",
                     [
                         {text: 'Ok'},
                     ],
@@ -173,8 +173,8 @@ export default class LoginScreen extends Component {
         //if network not connected
         else {
             Alert.alert(
-                'Erro',
-                'Sem Internet, não foi possível efetuar login.',
+                'Error',
+                'No intenet connection.',
                 [
                     {text: 'Ok'},
                 ],
@@ -213,8 +213,8 @@ export default class LoginScreen extends Component {
                                   }
                                   else {
                                       Alert.alert(
-                                          'Erro',
-                                          'Campos não preenchidos.',
+                                          'Error',
+                                          'Please fill both fields.',
                                           [
                                               {text: 'Ok'},
                                           ],
@@ -259,7 +259,7 @@ export default class LoginScreen extends Component {
                     <TextInput
                         style={LoginScreenStyles.input}
                         onChangeText={(text) => this.setState({email: text})}
-                        placeholder="E-Mail"
+                        placeholder="Username or E-Mail"
                         placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
                         autoCapitalize="none"
                         autoCorrect={true}
