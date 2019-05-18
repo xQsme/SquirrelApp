@@ -1,4 +1,4 @@
-const URL_BASE = 'http://loginserver.com';
+const URL_BASE = 'http://192.168.1.69:8000/api/';
 /**
  * The URL for the api method to dump the entire database
  * @type {string} - URL

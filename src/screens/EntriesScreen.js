@@ -4,7 +4,7 @@ import EntryList from "../components/screen_lists/EntryList";
 import {DBInterface} from "../utils/db/DBInterface";
 import {DBQueryHelper} from "../utils/db/DBQueryHelper";
 import BaseScreen from "./BaseScreen";
-import {ActivityIndicator, TouchableOpacity} from "react-native";
+import {ActivityIndicator, TouchableOpacity, Image} from "react-native";
 
 
 let isIos = require('react-native').Platform.OS === 'ios';
@@ -13,8 +13,11 @@ export default class EntriesScreen extends Component {
 
     static navigationOptions = ({navigation}) => {
         return {
-            title: 'Login Manager',
-            headerLeft: null,
+            title: 'Squirrel',
+            headerLeft: <Image
+                source={require('../utils/images/icon.png')}
+                style={{width: 35, height: 35, marginLeft: 15}}>
+            </Image>,
             headerRight: (
                 <TouchableOpacity
                     style={{paddingRight: 20}}

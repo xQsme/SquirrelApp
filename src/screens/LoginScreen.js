@@ -81,26 +81,25 @@ export default class LoginScreen extends Component {
 
             //Create Tables
             DBInterface.createTables();
-
+            /*
             AsyncStorageManager.storeOnAssyncStorage(this.state.email,
                 this.state.email,
                 "1",
                 "123");
-            this.resetNavigation('EntriesScreen');
+            this.resetNavigation('EntriesScreen');*/
 
-            /*Care4Value2CareApiFacade.login(this.state.email, this.state.password)
+            LoginManagerApiFacade.login(this.state.email, this.state.password)
                 .then((r) => {
                     if (r.status === 200) {
                         //Saves email, username, id and token of the logged user on storage to future use.
                         AsyncStorageManager.storeOnAssyncStorage(JSON.parse(r._bodyText).email != null ? JSON.parse(r._bodyText).email : "",
-                            JSON.parse(r._bodyText).username,
+                            JSON.parse(r._bodyText).name,
                             JSON.stringify(JSON.parse(r._bodyText).user_id),
                             JSON.parse(r._bodyText).token);
-
-                        let change = JSON.parse(r._bodyText).password_changed;
+                        this.resetNavigation('EntriesScreen');
 
                         //get data with the token and insertDump
-                        Care4Value2CareApiFacade.dump(JSON.parse(r._bodyText).token)
+                        /*Care4Value2CareApiFacade.dump(JSON.parse(r._bodyText).token)
                             .then((responseJson) => {
                                 DBInterface.insertDump(responseJson)
                                     .then((r => {
@@ -141,7 +140,7 @@ export default class LoginScreen extends Component {
                                     loading: false,
                                 });
                                 AsyncStorageManager.clearUserData()
-                            });
+                            });*/
                     } else {
                         Alert.alert(
                             'Error',
@@ -168,7 +167,7 @@ export default class LoginScreen extends Component {
                 this.setState({
                     loading: false,
                 });
-            });*/
+            });
         }
         //if network not connected
         else {
