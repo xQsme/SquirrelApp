@@ -361,7 +361,6 @@ export default class LoginScreen extends Component {
             <KeyboardAvoidingView style={{flex: 1, backgroundColor: 'rgb(212, 157, 65)'}} behavior={isIos ? 'padding' : null} >
                 <ScrollView contentContainerStyle={{
                     flexGrow: 1,
-                    paddingTop: DEVICE_WIDTH / 10,
                     alignContent: 'center',
                     alignItems: 'center',
                     }}>
