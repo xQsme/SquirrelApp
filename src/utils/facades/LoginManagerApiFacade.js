@@ -5,6 +5,7 @@ const URL_BASE = 'http://192.168.1.69:8000/api/';
  */
 const URL_GET_DUMP = URL_BASE + 'dump';
 const URL_POST_LOGIN = URL_BASE + 'login';
+const URL_POST_REGISTER = URL_BASE + 'register';
 const URL_LOGOUT = URL_BASE + 'logout';
 
 
@@ -86,52 +87,6 @@ export class LoginManagerApiFacade {
             })
     }
 
-
-    /**
-     * Function to get the entire content of the data base after the given timestamp
-     * * @param timestamp - {string} - e.g. '2018-04-09 17:33:42.429859', '2018', '2018-02 or '0'
-     * @returns {Promise} - resolve gets the dump in JSON format; reject gets the error message
-     */
-    static dumpAfter(timestamp, token) {
-        return new Promise(
-            function (resolve, reject) {
-                get(URL_DUMP_AFTER(timestamp),
-                    {
-                        //headers
-                        Accept: 'application/json',
-                        Authorization: "Bearer " + token,
-                    }
-                )
-                    .then((r) => {
-                        resolve(r);
-                    })
-                    .catch(e => reject(e));
-            }
-        )
-    }
-
-    static submitAnswers(json, token) {
-        return new Promise(
-            function (resolve, reject) {
-                post(URL_POST_UPDATE_ANSWERS,
-                    {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                        Authorization: "Bearer " + token,
-                    },
-
-                    JSON.stringify(json)
-                )
-                    .then((r) => {
-                        resolve(r);
-                    })
-                    .catch(e => {
-                        reject(e)
-                    });
-            })
-    }
-
-
     static login(email, password) {
         return new Promise(
             function (resolve, reject) {
@@ -156,19 +111,19 @@ export class LoginManagerApiFacade {
             })
     }
 
-    static changePassword(email, password, token) {
+    static register(username, email, password) {
         return new Promise(
             function (resolve, reject) {
-                post(URL_POST_PASSWORD,
+                post(URL_POST_REGISTER,
                     {
                         //headers
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
-                        Authorization: "Bearer " + token,
                     },
                     JSON.stringify({
-                        password: email,
-                        confirmation: password
+                        name: username,
+                        email: email,
+                        password: password
                     })
                 )
                     .then((r) => {

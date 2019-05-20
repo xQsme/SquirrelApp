@@ -62,16 +62,12 @@ export class DBInterface {
 
     static insertDump(dump) {
         return new Promise(function (resolve, reject) {
-
             DBInterface.db.transaction((tx) => {
-
                 for (let i = 0; i < dump.length; i++) {
-                    console.log(dump[i]);
                     tx.executeSql('INSERT OR REPLACE INTO login (source, ip, date, time) '
                         + ' VALUES (\"' + dump[i].source + '\", \"' + dump[i].ip + '\",'
                         + ' \"' + dump[i].date + '\", \"' + dump[i].time + '\");');
                 }
-    
             }, () => {
                 //erro
                 reject("Erro");

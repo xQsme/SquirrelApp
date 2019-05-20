@@ -24,11 +24,14 @@ export default class LoginScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            username: null,
             email: null,
             password: null,
+            passwordConf: null,
             loading: false,
             isLoading: true,
             sqrl: false,
+            register: false,
         };
 
         AsyncStorageManager.getUserToken()
@@ -66,6 +69,76 @@ export default class LoginScreen extends Component {
         this.state.status = isConnected;
     };
 
+    handleRegister() {
+
+        //if network connected
+        if (this.state.status) {
+            this.setState({
+                loading: true,
+            });
+
+            //Open db Connection
+            DBInterface.openDBConnection();
+
+            //Drop Tables ---- ONLY USED IF NEEDED TO UPDATE db
+            //DBInterface.dropTables();
+
+            //Create Tables
+            DBInterface.createTables();
+            /*
+            AsyncStorageManager.storeOnAssyncStorage(this.state.email,
+                this.state.email,
+                "1",
+                "123");
+            this.resetNavigation('EntriesScreen');*/
+
+            LoginManagerApiFacade.register(this.state.username, this.state.email, this.state.password)
+                .then((r) => {
+                    if (r.status === 200) {
+                        this.handleLogin();
+                    } else {
+                        Alert.alert(
+                            'Error',
+                            r._bodyText.split('["')[1].split('"]')[0].split('","').join('\n'),
+                            [
+                                {text: 'Ok'},
+                            ],
+                            {cancelable: false}
+                        );
+                        this.setState({
+                            loading: false,
+                        });
+                    }
+
+                }).catch((error) => {
+                Alert.alert(
+                    'Error',
+                    "Register Failed.",
+                    [
+                        {text: 'Ok'},
+                    ],
+                    {cancelable: false}
+                );
+                this.setState({
+                    loading: false,
+                });
+            });
+        }
+        //if network not connected
+        else {
+            Alert.alert(
+                'Error',
+                'No intenet connection.',
+                [
+                    {text: 'Ok'},
+                ],
+                {cancelable: false}
+            );
+            this.setState({
+                loading: false,
+            });
+        }
+    }
 
     handleLogin() {
 
@@ -191,59 +264,226 @@ export default class LoginScreen extends Component {
         this._passwordInput && this._passwordInput.focus();
     };
 
-    handleActivityIndicator() {
-        if (this.state.loading) {
+    handleActivityIndicator() 
+    {
+        if (this.state.loading) 
+        {
             return (<ActivityIndicator size="large" color="#ffffff"/>);
         }
-
-        return (<View style={{height: 50}}>
-            <TouchableOpacity style={LoginScreenStyles.button}
-                              onPress={() => {
-                                  if (this.state.email != null && this.state.password != null) {
-                                        this.handleLogin();
-                                  }
-                                  else {
-                                      Alert.alert(
-                                          'Error',
-                                          'Please fill both fields.',
-                                          [
-                                              {text: 'Ok'},
-                                          ],
-                                          {cancelable: false}
-                                      );
-                                  }
-
-                              }}>
-                <Text style={ButtonStyles.text}>
-                    Login
-                </Text>
-            </TouchableOpacity>
-        </View>);
+        if(this.state.register)
+        {
+            return(
+                <View>
+                    <View style={{height: 75}}> 
+                        <TouchableOpacity style={LoginScreenStyles.button}
+                            onPress={() => {
+                                if (this.state.username != null && this.state.email != null && this.state.password != null && this.state.passwordConf != null) {
+                                    if(this.state.password == this.state.passwordConf)
+                                    {
+                                        this.handleRegister();
+                                    }
+                                    else
+                                    {
+                                        Alert.alert(
+                                            'Error',
+                                            'Passwords must match.',
+                                            [
+                                                {text: 'Ok'},
+                                            ],
+                                            {cancelable: false}
+                                        );
+                                    }
+                                }
+                                else {
+                                    Alert.alert(
+                                        'Error',
+                                        'Please fill all fields.',
+                                        [
+                                            {text: 'Ok'},
+                                        ],
+                                        {cancelable: false}
+                                    );
+                                }
+                        }}>
+                        <Text style={ButtonStyles.text}>
+                            Register
+                        </Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={{height: 50}}>
+                        <TouchableOpacity style={LoginScreenStyles.button}
+                            onPress={() => this.setState({register: false})}>
+                            <Text style={ButtonStyles.text}>
+                            Login Instead
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>);
+        }
+        return(
+            <View>
+                <View style={{height: 75}}> 
+                    <TouchableOpacity style={LoginScreenStyles.button}
+                        onPress={() => {
+                            if (this.state.email != null && this.state.password != null) {
+                                this.handleLogin();
+                            }
+                            else {
+                                Alert.alert(
+                                    'Error',
+                                    'Please fill both fields.',
+                                    [
+                                        {text: 'Ok'},
+                                    ],
+                                    {cancelable: false}
+                                );
+                            }
+                    }}>
+                    <Text style={ButtonStyles.text}>
+                        Login
+                    </Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={{height: 50}}>
+                    <TouchableOpacity style={LoginScreenStyles.button}
+                        onPress={() => this.setState({register: true})}>
+                        <Text style={ButtonStyles.text}>
+                        Register Instead
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            </View>);
     }
 
     render() {
 
         return (
             <KeyboardAvoidingView style={{flex: 1, backgroundColor: 'rgb(212, 157, 65)'}} behavior={isIos ? 'padding' : null} >
-
-
                 <ScrollView contentContainerStyle={{
                     flexGrow: 1,
                     paddingTop: DEVICE_WIDTH / 10,
                     alignContent: 'center',
                     alignItems: 'center',
                     }}>
+                    <View style={{paddingTop:30, paddingBottom: 30}}>
+                        <TouchableOpacity
+                            onPress={() => {this.setState({sqrl: !this.state.sqrl})}}>
+                            <Image
+                                source={this.state.sqrl ? sqrl : logo}
+                                style={{width: 200, height: 200}}
+                            />
+                        </TouchableOpacity>
+                    </View>
+                    {this.renderLogin()}
+                    {this.handleActivityIndicator()}
+                </ScrollView>
+            </KeyboardAvoidingView>
+        );
+    }
 
-                <View style={{paddingTop:30, paddingBottom: 30}}>
-                    <TouchableOpacity
-                        onPress={() => {this.setState({sqrl: !this.state.sqrl})}}>
-                        <Image
-                            source={this.state.sqrl ? sqrl : logo}
-                            style={{width: 200, height: 200}}
+    renderLogin(){
+        if(this.state.register)
+        {
+            return(
+                <View>
+                    <View style={{height: 50}}>
+                        <Icon
+                            ios={'ios-person'}
+                            android={'md-person'}
+                            style={LoginScreenStyles.inlineImg}
                         />
-                    </TouchableOpacity>
-                </View>
-
+                        <TextInput
+                            style={LoginScreenStyles.input}
+                            onChangeText={(text) => this.setState({username: text})}
+                            placeholder="Username"
+                            placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
+                            autoCapitalize="none"
+                            autoCorrect={true}
+                            keyboardType="email-address"
+                            returnKeyType="next"
+                            blurOnSubmit={false}
+                            onSubmitEditing={(event) => { 
+                                this.refs.email.focus(); 
+                              }}
+                            enablesReturnKeyAutomatically={true}
+                            underlineColorAndroid='rgba(0,0,0,0)'
+                            value={this.state.username}
+                            keyboardShouldPersistTaps={'handled'}
+                        />
+                    </View>
+                    <View style={{height: 50}}>
+                        <Icon
+                            ios={'ios-person'}
+                            android={'md-person'}
+                            style={LoginScreenStyles.inlineImg}
+                        />
+                        <TextInput
+                            style={LoginScreenStyles.input}
+                            ref='email'
+                            onChangeText={(text) => this.setState({email: text})}
+                            placeholder="E-Mail"
+                            placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
+                            autoCapitalize="none"
+                            autoCorrect={true}
+                            keyboardType="email-address"
+                            returnKeyType="next"
+                            blurOnSubmit={false}
+                            onSubmitEditing={(event) => { 
+                                this.refs.password.focus(); 
+                              }}
+                            enablesReturnKeyAutomatically={true}
+                            underlineColorAndroid='rgba(0,0,0,0)'
+                            value={this.state.email}
+                            keyboardShouldPersistTaps={'handled'}
+                        />
+                    </View>
+                    <View style={{height: 50}}>
+                        <Icon
+                            ios={'ios-lock'}
+                            android={'md-lock'}
+                            style={LoginScreenStyles.inlineImg}
+                        />
+                        <TextInput
+                            style={LoginScreenStyles.input}
+                            ref='password'
+                            onChangeText={(text) => this.setState({password: text})}
+                            placeholder="Password"
+                            placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
+                            keyboardType="default"
+                            returnKeyType="next"
+                            onSubmitEditing={(event) => { 
+                                this.refs.passwordconf.focus(); 
+                              }}
+                            blurOnSubmit={true}
+                            secureTextEntry={true}
+                            underlineColorAndroid='rgba(0,0,0,0)'
+                            value={this.state.password}
+                        />
+                    </View>
+                    <View style={{height: 80}}>
+                        <Icon
+                            ios={'ios-lock'}
+                            android={'md-lock'}
+                            style={LoginScreenStyles.inlineImg}
+                        />
+                        <TextInput
+                            style={LoginScreenStyles.input}
+                            ref='passwordconf'
+                            onChangeText={(text) => this.setState({passwordConf: text})}
+                            placeholder="Password Confirmation"
+                            placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
+                            keyboardType="default"
+                            returnKeyType="done"
+                            blurOnSubmit={true}
+                            secureTextEntry={true}
+                            underlineColorAndroid='rgba(0,0,0,0)'
+                            value={this.state.passwordConf}
+                        />
+                    </View>
+                </View>);
+        }
+        return(
+            <View>
                 <View style={{height: 50}}>
                     <Icon
                         ios={'ios-person'}
@@ -260,7 +500,9 @@ export default class LoginScreen extends Component {
                         keyboardType="email-address"
                         returnKeyType="next"
                         blurOnSubmit={false}
-                        onSubmitEditing={this._next}
+                        onSubmitEditing={(event) => { 
+                            this.refs.pass.focus(); 
+                          }}
                         enablesReturnKeyAutomatically={true}
                         underlineColorAndroid='rgba(0,0,0,0)'
                         value={this.state.email}
@@ -276,9 +518,7 @@ export default class LoginScreen extends Component {
                     />
                     <TextInput
                         style={LoginScreenStyles.input}
-                        ref={ref => {
-                            this._passwordInput = ref
-                        }}
+                        ref='pass'
                         onChangeText={(text) => this.setState({password: text})}
                         placeholder="Password"
                         placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
@@ -290,11 +530,6 @@ export default class LoginScreen extends Component {
                         value={this.state.password}
                     />
                 </View>
-                {
-                    this.handleActivityIndicator()
-                }
-                </ScrollView>
-            </KeyboardAvoidingView>
-        );
+            </View>);
     }
 }
