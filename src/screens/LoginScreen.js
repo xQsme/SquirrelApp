@@ -96,26 +96,16 @@ export default class LoginScreen extends Component {
                             JSON.parse(r._bodyText).name,
                             JSON.stringify(JSON.parse(r._bodyText).user_id),
                             JSON.parse(r._bodyText).token);
-                        this.resetNavigation('EntriesScreen');
-
                         //get data with the token and insertDump
-                        /*Care4Value2CareApiFacade.dump(JSON.parse(r._bodyText).token)
+                        LoginManagerApiFacade.dump(JSON.parse(r._bodyText).token)
                             .then((responseJson) => {
                                 DBInterface.insertDump(responseJson)
                                     .then((r => {
-                                        //navigate to surveys screen and delete navigation props, so that back option isn't available
-                                        if(!change)
-                                        {
-                                            this.resetNavigation('ChangePasswordScreen');
-                                        }
-                                        else
-                                        {
-                                            this.resetNavigation('SurveysScreen');
-                                        }
+                                        this.resetNavigation('EntriesScreen');
                                     })).catch((e) => {
                                     Alert.alert(
                                         'Error',
-                                        "Error inserting informaçation.",
+                                        "Error inserting information.",
                                         [
                                             {text: 'Ok'},
                                         ],
@@ -140,7 +130,7 @@ export default class LoginScreen extends Component {
                                     loading: false,
                                 });
                                 AsyncStorageManager.clearUserData()
-                            });*/
+                            });
                     } else {
                         Alert.alert(
                             'Error',

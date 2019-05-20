@@ -64,17 +64,23 @@ export default class EntryList extends Component {
                 centerContent={
                     <View>
                         <Text>
-                            {item.title}
+                            {item.source}
                         </Text>
-                        <Text note>
-                            {item.description}
-                        </Text>
-                        <Text note style={{color: 'black'}}>
-                            Total keys: {item.total}
+                        <Text>
+                            {item.ip}
                         </Text>
                     </View>
                 }
-                rightContent={this.renderIcon(item)}
+                rightContent={
+                    <View>
+                        <Text>
+                            {item.date}
+                        </Text>
+                        <Text>
+                            {item.time}
+                        </Text>
+                    </View>
+                }
             />
         );
     }
@@ -95,16 +101,8 @@ export default class EntryList extends Component {
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({item}) =>
                         <ListItem
-                            style={{marginLeft: 0, paddingLeft: 15}}
-                            onPress={() => {
-                                this.props.navigation.navigate('KeysScreen', {
-                                    login: item,
-                                    onNavigateBack: this.props.onNavigateBack,
-                                })
-                            }}>
-
+                            style={{marginLeft: 0, paddingLeft: 15}}>
                             {this.renderRow(item)}
-
                         </ListItem>
                     }
                 />
