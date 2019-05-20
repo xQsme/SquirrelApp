@@ -26,11 +26,12 @@ export default class RowItem extends Component {
             }}>
 
                 <Body >
-                {this.props.centerContent}
-                {this.props.centerContentDown}
+                    {this.props.centerContent}
+                    {this.props.centerContentDown}
                 </Body>
 
-                <Body style={{alignItems: 'flex-end'}}>
+                <Body style={{alignItems: 'flex-end',
+                            textAlign: 'right'}}>
                     {this.props.rightContent}
                 </Body>
             </View>

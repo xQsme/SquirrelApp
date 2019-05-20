@@ -11,6 +11,7 @@ import {LoginManagerApiFacade} from "../utils/facades/LoginManagerApiFacade";
 import {DBInterface} from "../utils/db/DBInterface";
 import {AsyncStorageManager} from "../utils/AsyncStorageManager";
 import logo from '../utils/images/logo.png';
+import sqrl from '../utils/images/sqrl.png';
 
 const Dimensions = require('Dimensions');
 const DEVICE_WIDTH = Dimensions.get('window').width;
@@ -26,7 +27,8 @@ export default class LoginScreen extends Component {
             email: null,
             password: null,
             loading: false,
-            isLoading: true
+            isLoading: true,
+            sqrl: false,
         };
 
         AsyncStorageManager.getUserToken()
@@ -233,10 +235,13 @@ export default class LoginScreen extends Component {
                     }}>
 
                 <View style={{paddingTop:30, paddingBottom: 30}}>
-                <Image
-                    source={logo}
-                    style={{width: 200, height: 200}}
-                />
+                    <TouchableOpacity
+                        onPress={() => {this.setState({sqrl: !this.state.sqrl})}}>
+                        <Image
+                            source={this.state.sqrl ? sqrl : logo}
+                            style={{width: 200, height: 200}}
+                        />
+                    </TouchableOpacity>
                 </View>
 
                 <View style={{height: 50}}>
