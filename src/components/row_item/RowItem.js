@@ -30,8 +30,7 @@ export default class RowItem extends Component {
                     {this.props.centerContentDown}
                 </Body>
 
-                <Body style={{alignItems: 'flex-end',
-                            textAlign: 'right'}}>
+                <Body style={{alignItems: 'flex-end'}}>
                     {this.props.rightContent}
                 </Body>
             </View>

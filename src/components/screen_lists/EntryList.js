@@ -73,10 +73,10 @@ export default class EntryList extends Component {
                 }
                 rightContent={
                     <View>
-                        <Text>
+                        <Text style={{textAlign: 'right'}}>
                             {item.date}
                         </Text>
-                        <Text>
+                        <Text style={{textAlign: 'right'}}>
                             {item.time}
                         </Text>
                     </View>
