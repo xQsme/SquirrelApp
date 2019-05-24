@@ -12,6 +12,7 @@ import {DBInterface} from "../utils/db/DBInterface";
 import {AsyncStorageManager} from "../utils/AsyncStorageManager";
 import logo from '../utils/images/logo.png';
 import sqrl from '../utils/images/sqrl.png';
+import fingerprint from '../utils/images/fingerprint.png';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 
 const Dimensions = require('Dimensions');
@@ -77,6 +78,11 @@ export default class LoginScreen extends Component {
         FingerprintScanner
             .authenticate({ onAttempt: this.handleAuthenticationAttempted })
             .then(() => {
+                if(this.state.checkPin)
+                {
+                    this.setState({pinCheck: true});
+                    this.redirect(false);
+                }
             })
             .catch((error) => {
             });
@@ -92,11 +98,15 @@ export default class LoginScreen extends Component {
     };
 
     handleAuthenticationAttempted = (error) => {
-        if(this.state.checkPin)
-        {
-            this.setState({pinCheck: true});
-        }
-      };
+        Alert.alert(
+            'Error',
+            "Fingerprint read failed.",
+            [
+                {text: 'Ok'},
+            ],
+            {cancelable: false}
+        );
+    };
 
     handleRegister() {
 
@@ -371,7 +381,7 @@ export default class LoginScreen extends Component {
                             autoCapitalize="none"
                             autoCorrect={true}
                             keyboardType="number-pad"
-                            returnKeyType="next"
+                            returnKeyType="done"
                             blurOnSubmit={false}
                             enablesReturnKeyAutomatically={true}
                             underlineColorAndroid='rgba(0,0,0,0)'
@@ -423,6 +433,12 @@ export default class LoginScreen extends Component {
                     justifyContent: 'center',
                     alignItems: 'center',
                 }}>
+                    <View style={{paddingBottom: 30}}>
+                        <Image
+                            source={fingerprint}
+                            style={{width: 150, height: 150}}
+                        />
+                    </View>
                     <View style={{height: 50}}>
                         <Icon
                             ios={'ios-lock'}
@@ -437,7 +453,7 @@ export default class LoginScreen extends Component {
                             autoCapitalize="none"
                             autoCorrect={true}
                             keyboardType="number-pad"
-                            returnKeyType="next"
+                            returnKeyType="done"
                             blurOnSubmit={false}
                             enablesReturnKeyAutomatically={true}
                             underlineColorAndroid='rgba(0,0,0,0)'
