@@ -36,7 +36,10 @@ export default class LoginScreen extends Component {
             google: null,
             fido: null,
             email_code: null,
-            info: null
+            info: null,
+            code_1: null,
+            code_2: null,
+            code_3: null
         };
 
         AsyncStorageManager.getUserToken()
@@ -408,14 +411,8 @@ export default class LoginScreen extends Component {
                         alignItems: 'center',
                         }}>
                         {this.render2FA()}
-                        {this.renderError()}
                     </ScrollView>
                 </KeyboardAvoidingView>);
-    }
-
-    renderError()
-    {
-        return(<Text>{this.state.failed ? 'Wrong code, try again' : ''}</Text>)
     }
 
     render2FA()
@@ -475,6 +472,7 @@ export default class LoginScreen extends Component {
                         </Text>
                     </TouchableOpacity>
                 </View>
+                <Text style={{color: 'black', fontSize: 20}}>{this.state.failed ? 'Wrong code, try again' : ''}</Text>
             </View>);
         }
         if(this.state.fido)
@@ -522,6 +520,7 @@ export default class LoginScreen extends Component {
                         </Text>
                     </TouchableOpacity>
                 </View>
+                <Text style={{color: 'black', fontSize: 20}}>{this.state.failed ? 'Wrong code, try again' : ''}</Text>
             </View>);
         }
         if(this.state.email_code)
@@ -608,6 +607,7 @@ export default class LoginScreen extends Component {
                         </Text>
                     </TouchableOpacity>
                 </View>
+                <Text style={{color: 'black', fontSize: 20}}>{this.state.failed ? 'Wrong code, try again' : ''}</Text>
             </View>);
         }
     }
