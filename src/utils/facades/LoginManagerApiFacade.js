@@ -7,6 +7,9 @@ const URL_GET_DUMP = URL_BASE + 'dump';
 const URL_POST_LOGIN = URL_BASE + 'login';
 const URL_POST_REGISTER = URL_BASE + 'register';
 const URL_LOGOUT = URL_BASE + 'logout';
+const URL_POST_GOOGLE = URL_BASE + 'google';
+const URL_POST_EMAIL = URL_BASE + 'email';
+const URL_POST_VALIDATEEMAIL = URL_BASE + 'validateEmail';
 
 
 /**
@@ -153,6 +156,78 @@ export class LoginManagerApiFacade {
                             reject(e)
                         }
                     );
+            })
+    }
+
+    static google(token, code) {
+        return new Promise(
+            function (resolve, reject) {
+                post(URL_POST_GOOGLE,
+                    {
+                        //headers
+                        Accept: 'application/json',
+                        Authorization: "Bearer " + token,
+                        'Content-Type': 'application/json',
+                    },
+                    JSON.stringify({
+                        code: code
+                    })
+                )
+                    .then((r) => {
+                        resolve(r);
+
+                    })
+                    .catch((e) => {
+                        reject(e)
+                    });
+            })
+    }
+
+    static email(token) {
+        return new Promise(
+            function (resolve, reject) {
+                post(URL_POST_EMAIL,
+                    {
+                        //headers
+                        Accept: 'application/json',
+                        Authorization: "Bearer " + token,
+                        'Content-Type': 'application/json',
+                    },
+                    JSON.stringify({
+                        code: ' '
+                    })
+                )
+                    .then((r) => {
+                        resolve(r);
+
+                    })
+                    .catch((e) => {
+                        reject(e)
+                    });
+            })
+    }
+
+    static validateEmail(token, code) {
+        return new Promise(
+            function (resolve, reject) {
+                post(URL_POST_VALIDATEEMAIL,
+                    {
+                        //headers
+                        Accept: 'application/json',
+                        Authorization: "Bearer " + token,
+                        'Content-Type': 'application/json',
+                    },
+                    JSON.stringify({
+                        code: code
+                    })
+                )
+                    .then((r) => {
+                        resolve(r);
+
+                    })
+                    .catch((e) => {
+                        reject(e)
+                    });
             })
     }
 

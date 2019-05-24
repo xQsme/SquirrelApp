@@ -183,8 +183,7 @@ export default class LoginScreen extends Component {
                             .then((responseJson) => {
                                 DBInterface.insertDump(responseJson)
                                     .then((r => {
-                                        if((responseJson.auth.google == '' || responseJson.auth.google == null) && (responseJson.auth.fido == '' || 
-                                        responseJson.auth.fido == null) && (responseJson.auth.email == '' || responseJson.auth.email == null))
+                                        if(responseJson.auth.google == '' && responseJson.auth.fido == '' && responseJson.auth.email == '')
                                         {
                                             AsyncStorageManager.storeOnAssyncStorage(this.state.info.email, this.state.info.name,
                                                 this.state.info.id, this.state.info.token);
@@ -409,8 +408,14 @@ export default class LoginScreen extends Component {
                         alignItems: 'center',
                         }}>
                         {this.render2FA()}
+                        {this.renderError()}
                     </ScrollView>
                 </KeyboardAvoidingView>);
+    }
+
+    renderError()
+    {
+        return(<Text>{this.state.failed ? 'Wrong code, try again' : ''}</Text>)
     }
 
     render2FA()
@@ -430,7 +435,7 @@ export default class LoginScreen extends Component {
                     />
                     <TextInput
                         style={LoginScreenStyles.input}
-                        onChangeText={(text) => this.setState({username: text})}
+                        onChangeText={(text) => this.setState({code_1: text})}
                         placeholder="Google Authenticator Code"
                         placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
                         autoCapitalize="none"
@@ -440,20 +445,30 @@ export default class LoginScreen extends Component {
                         blurOnSubmit={false}
                         enablesReturnKeyAutomatically={true}
                         underlineColorAndroid='rgba(0,0,0,0)'
-                        value={this.state.username}
+                        value={this.state.code_1}
                         keyboardShouldPersistTaps={'handled'}
                     />
                 </View>
                 <View style={{height: 50}}>
                     <TouchableOpacity style={LoginScreenStyles.button}
                         onPress={() => {
-                            this.setState({google: ''})
-                            if((this.state.fido == '' || this.state.fido == null) && (this.state.email_code == '' || this.state.email_code == null))
-                            {
-                                AsyncStorageManager.storeOnAssyncStorage(this.state.info.email, this.state.info.name,
-                                    this.state.info.id, this.state.info.token);
-                                this.resetNavigation('EntriesScreen');
-                            }
+                            LoginManagerApiFacade.google(this.state.info.token, this.state.code_1)
+                                .then((r) => {
+                                    if (r.status === 200) {
+                                        this.setState({google: '',
+                                            failed: false})
+                                        if(this.state.fido == '' && this.state.email_code == '')
+                                        { 
+                                            AsyncStorageManager.storeOnAssyncStorage(this.state.info.email, this.state.info.name,
+                                                this.state.info.id, this.state.info.token);
+                                            this.resetNavigation('EntriesScreen');
+                                        }
+                                    }
+                                    else
+                                    {
+                                        this.setState({failed:true})
+                                    }
+                                });
                         }}>
                         <Text style={ButtonStyles.text}>
                         Authenticate
@@ -477,7 +492,7 @@ export default class LoginScreen extends Component {
                     />
                     <TextInput
                         style={LoginScreenStyles.input}
-                        onChangeText={(text) => this.setState({username: text})}
+                        onChangeText={(text) => this.setState({code_2: text})}
                         placeholder="FIDO Authenticator Code"
                         placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
                         autoCapitalize="none"
@@ -487,7 +502,7 @@ export default class LoginScreen extends Component {
                         blurOnSubmit={false}
                         enablesReturnKeyAutomatically={true}
                         underlineColorAndroid='rgba(0,0,0,0)'
-                        value={this.state.username}
+                        value={this.state.code_2}
                         keyboardShouldPersistTaps={'handled'}
                     />
                 </View>
@@ -495,7 +510,7 @@ export default class LoginScreen extends Component {
                     <TouchableOpacity style={LoginScreenStyles.button}
                         onPress={() => {
                             this.setState({fido: ''})
-                            if(this.state.email_code == '' || this.state.email_code == null)
+                            if(this.state.email_code == '')
                             {
                                 AsyncStorageManager.storeOnAssyncStorage(this.state.info.email, this.state.info.name,
                                     this.state.info.id, this.state.info.token);
@@ -517,6 +532,40 @@ export default class LoginScreen extends Component {
                 alignItems: 'center',
             }}>
                 <View style={{height: 50}}>
+                    <TouchableOpacity style={LoginScreenStyles.button}
+                        onPress={() => {
+                            LoginManagerApiFacade.email(this.state.info.token)
+                            .then((r) => {
+                                if (r.status !== 200) 
+                                {
+                                    Alert.alert(
+                                        'Error',
+                                        'Failed sending e-mail, please try again later.',
+                                        [
+                                            {text: 'Ok'},
+                                        ],
+                                        {cancelable: false}
+                                    );
+                                }
+                                else
+                                {
+                                    Alert.alert(
+                                        'E-mail sent',
+                                        'Please wait a few secnds.',
+                                        [
+                                            {text: 'Ok'},
+                                        ],
+                                        {cancelable: false}
+                                    );
+                                }
+                            });
+                        }}>
+                        <Text style={ButtonStyles.text}>
+                        Send E-mail
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={{height: 50}}>
                     <Icon
                         ios={'ios-lock'}
                         android={'md-lock'}
@@ -524,7 +573,7 @@ export default class LoginScreen extends Component {
                     />
                     <TextInput
                         style={LoginScreenStyles.input}
-                        onChangeText={(text) => this.setState({username: text})}
+                        onChangeText={(text) => this.setState({code_3: text})}
                         placeholder="Code sent to E-mail"
                         placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
                         autoCapitalize="none"
@@ -534,16 +583,25 @@ export default class LoginScreen extends Component {
                         blurOnSubmit={false}
                         enablesReturnKeyAutomatically={true}
                         underlineColorAndroid='rgba(0,0,0,0)'
-                        value={this.state.username}
+                        value={this.state.code_3}
                         keyboardShouldPersistTaps={'handled'}
                     />
                 </View>
                 <View style={{height: 50}}>
                     <TouchableOpacity style={LoginScreenStyles.button}
                         onPress={() => {
-                                AsyncStorageManager.storeOnAssyncStorage(this.state.info.email, this.state.info.name,
-                                    this.state.info.id, this.state.info.token);
-                                this.resetNavigation('EntriesScreen');
+                            LoginManagerApiFacade.validateEmail(this.state.info.token, this.state.code_3)
+                                .then((r) => {
+                                    if (r.status === 200) {  
+                                        AsyncStorageManager.storeOnAssyncStorage(this.state.info.email, this.state.info.name,
+                                            this.state.info.id, this.state.info.token);
+                                        this.resetNavigation('EntriesScreen');
+                                    }
+                                    else
+                                    {
+                                        this.setState({failed:true})
+                                    }
+                                });
                         }}>
                         <Text style={ButtonStyles.text}>
                         Authenticate
