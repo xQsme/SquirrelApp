@@ -39,7 +39,9 @@ export default class LoginScreen extends Component {
             info: null,
             code_1: null,
             code_2: null,
-            code_3: null
+            code_3: null,
+            failed: false,
+            red: false,
         };
 
         AsyncStorageManager.getUserToken()
@@ -463,7 +465,11 @@ export default class LoginScreen extends Component {
                                     }
                                     else
                                     {
-                                        this.setState({failed:true})
+                                        this.setState({failed:true,
+                                            red: true});
+                                        setTimeout(()=>{
+                                            this.setState({red: false});
+                                        }, 2000);
                                     }
                                 });
                         }}>
@@ -472,7 +478,7 @@ export default class LoginScreen extends Component {
                         </Text>
                     </TouchableOpacity>
                 </View>
-                <Text style={{color: 'black', fontSize: 20}}>{this.state.failed ? 'Wrong code, try again' : ''}</Text>
+                <Text style={{color: this.state.red ? 'red' : 'black', fontSize: 20}}>{this.state.failed ? 'Wrong code, try again' : ''}</Text>
             </View>);
         }
         if(this.state.fido)
@@ -520,7 +526,7 @@ export default class LoginScreen extends Component {
                         </Text>
                     </TouchableOpacity>
                 </View>
-                <Text style={{color: 'black', fontSize: 20}}>{this.state.failed ? 'Wrong code, try again' : ''}</Text>
+                <Text style={{color: this.state.red ? 'red' : 'black', fontSize: 20}}>{this.state.failed ? 'Wrong code, try again' : ''}</Text>
             </View>);
         }
         if(this.state.email_code)
@@ -550,7 +556,7 @@ export default class LoginScreen extends Component {
                                 {
                                     Alert.alert(
                                         'E-mail sent',
-                                        'Please wait a few secnds.',
+                                        'Please wait a few seconds.',
                                         [
                                             {text: 'Ok'},
                                         ],
@@ -598,7 +604,11 @@ export default class LoginScreen extends Component {
                                     }
                                     else
                                     {
-                                        this.setState({failed:true})
+                                        this.setState({failed:true,
+                                                       red: true});
+                                        setTimeout(()=>{
+                                            this.setState({red: false});
+                                        }, 2000);
                                     }
                                 });
                         }}>
@@ -607,7 +617,7 @@ export default class LoginScreen extends Component {
                         </Text>
                     </TouchableOpacity>
                 </View>
-                <Text style={{color: 'black', fontSize: 20}}>{this.state.failed ? 'Wrong code, try again' : ''}</Text>
+                <Text style={{color: this.state.red ? 'red' : 'black', fontSize: 20}}>{this.state.failed ? 'Wrong code, try again' : ''}</Text>
             </View>);
         }
     }
