@@ -32,6 +32,11 @@ export default class LoginScreen extends Component {
             isLoading: true,
             sqrl: false,
             register: false,
+            login: false,
+            google: null,
+            fido: null,
+            email_code: null,
+            info: null
         };
 
         AsyncStorageManager.getUserToken()
@@ -167,16 +172,33 @@ export default class LoginScreen extends Component {
                 .then((r) => {
                     if (r.status === 200) {
                         //Saves email, username, id and token of the logged user on storage to future use.
-                        AsyncStorageManager.storeOnAssyncStorage(JSON.parse(r._bodyText).email != null ? JSON.parse(r._bodyText).email : "",
-                            JSON.parse(r._bodyText).name,
-                            JSON.stringify(JSON.parse(r._bodyText).user_id),
-                            JSON.parse(r._bodyText).token);
+                        this.setState({
+                            info: {name: JSON.parse(r._bodyText).name,
+                                   email: JSON.parse(r._bodyText).email != null ? JSON.parse(r._bodyText).email : "",
+                                   token: JSON.parse(r._bodyText).token,
+                                   id: JSON.stringify(JSON.parse(r._bodyText).user_id)}
+                        });
                         //get data with the token and insertDump
                         LoginManagerApiFacade.dump(JSON.parse(r._bodyText).token)
                             .then((responseJson) => {
                                 DBInterface.insertDump(responseJson)
                                     .then((r => {
-                                        this.resetNavigation('EntriesScreen');
+                                        if((responseJson.auth.google == '' || responseJson.auth.google == null) && (responseJson.auth.fido == '' || 
+                                        responseJson.auth.fido == null) && (responseJson.auth.email == '' || responseJson.auth.email == null))
+                                        {
+                                            AsyncStorageManager.storeOnAssyncStorage(this.state.info.email, this.state.info.name,
+                                                this.state.info.id, this.state.info.token);
+                                            this.resetNavigation('EntriesScreen');
+                                        }
+                                        else
+                                        {
+                                            this.setState({
+                                                google: responseJson.auth.google,
+                                                fido: responseJson.auth.fido,
+                                                email_code: responseJson.auth.email,
+                                                login: true
+                                            })
+                                        }
                                     })).catch((e) => {
                                     Alert.alert(
                                         'Error',
@@ -356,28 +378,180 @@ export default class LoginScreen extends Component {
     }
 
     render() {
+        if(!this.state.login)
+        {
+            return (
+                <KeyboardAvoidingView style={{flex: 1, backgroundColor: 'rgb(212, 157, 65)'}} behavior={isIos ? 'padding' : null} >
+                    <ScrollView contentContainerStyle={{
+                        flexGrow: 1,
+                        alignContent: 'center',
+                        alignItems: 'center',
+                        }}>
+                        <View style={{paddingTop:30, paddingBottom: 30}}>
+                            <TouchableOpacity
+                                onPress={() => {this.setState({sqrl: !this.state.sqrl})}}>
+                                <Image
+                                    source={this.state.sqrl ? sqrl : logo}
+                                    style={{width: 200, height: 200}}
+                                />
+                            </TouchableOpacity>
+                        </View>
+                        {this.renderLogin()}
+                        {this.handleActivityIndicator()}
+                    </ScrollView>
+                </KeyboardAvoidingView>
+            );
+        }
+        return(<KeyboardAvoidingView style={{flex: 1, backgroundColor: 'rgb(212, 157, 65)'}} behavior={isIos ? 'padding' : null} >
+                    <ScrollView contentContainerStyle={{
+                        flexGrow: 1,
+                        alignContent: 'center',
+                        alignItems: 'center',
+                        }}>
+                        {this.render2FA()}
+                    </ScrollView>
+                </KeyboardAvoidingView>);
+    }
 
-        return (
-            <KeyboardAvoidingView style={{flex: 1, backgroundColor: 'rgb(212, 157, 65)'}} behavior={isIos ? 'padding' : null} >
-                <ScrollView contentContainerStyle={{
-                    flexGrow: 1,
-                    alignContent: 'center',
-                    alignItems: 'center',
-                    }}>
-                    <View style={{paddingTop:30, paddingBottom: 30}}>
-                        <TouchableOpacity
-                            onPress={() => {this.setState({sqrl: !this.state.sqrl})}}>
-                            <Image
-                                source={this.state.sqrl ? sqrl : logo}
-                                style={{width: 200, height: 200}}
-                            />
-                        </TouchableOpacity>
-                    </View>
-                    {this.renderLogin()}
-                    {this.handleActivityIndicator()}
-                </ScrollView>
-            </KeyboardAvoidingView>
-        );
+    render2FA()
+    {
+        if(this.state.google)
+        {
+            return(
+            <View style={{flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}>
+                <View style={{height: 50}}>
+                    <Icon
+                        ios={'ios-lock'}
+                        android={'md-lock'}
+                        style={LoginScreenStyles.inlineImg}
+                    />
+                    <TextInput
+                        style={LoginScreenStyles.input}
+                        onChangeText={(text) => this.setState({username: text})}
+                        placeholder="Google Authenticator Code"
+                        placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
+                        autoCapitalize="none"
+                        autoCorrect={true}
+                        keyboardType="email-address"
+                        returnKeyType="next"
+                        blurOnSubmit={false}
+                        enablesReturnKeyAutomatically={true}
+                        underlineColorAndroid='rgba(0,0,0,0)'
+                        value={this.state.username}
+                        keyboardShouldPersistTaps={'handled'}
+                    />
+                </View>
+                <View style={{height: 50}}>
+                    <TouchableOpacity style={LoginScreenStyles.button}
+                        onPress={() => {
+                            this.setState({google: ''})
+                            if((this.state.fido == '' || this.state.fido == null) && (this.state.email_code == '' || this.state.email_code == null))
+                            {
+                                AsyncStorageManager.storeOnAssyncStorage(this.state.info.email, this.state.info.name,
+                                    this.state.info.id, this.state.info.token);
+                                this.resetNavigation('EntriesScreen');
+                            }
+                        }}>
+                        <Text style={ButtonStyles.text}>
+                        Authenticate
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            </View>);
+        }
+        if(this.state.fido)
+        {
+            return(
+            <View style={{flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}>
+                <View style={{height: 50}}>
+                    <Icon
+                        ios={'ios-lock'}
+                        android={'md-lock'}
+                        style={LoginScreenStyles.inlineImg}
+                    />
+                    <TextInput
+                        style={LoginScreenStyles.input}
+                        onChangeText={(text) => this.setState({username: text})}
+                        placeholder="FIDO Authenticator Code"
+                        placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
+                        autoCapitalize="none"
+                        autoCorrect={true}
+                        keyboardType="email-address"
+                        returnKeyType="next"
+                        blurOnSubmit={false}
+                        enablesReturnKeyAutomatically={true}
+                        underlineColorAndroid='rgba(0,0,0,0)'
+                        value={this.state.username}
+                        keyboardShouldPersistTaps={'handled'}
+                    />
+                </View>
+                <View style={{height: 50}}>
+                    <TouchableOpacity style={LoginScreenStyles.button}
+                        onPress={() => {
+                            this.setState({fido: ''})
+                            if(this.state.email_code == '' || this.state.email_code == null)
+                            {
+                                AsyncStorageManager.storeOnAssyncStorage(this.state.info.email, this.state.info.name,
+                                    this.state.info.id, this.state.info.token);
+                                this.resetNavigation('EntriesScreen');
+                            }
+                        }}>
+                        <Text style={ButtonStyles.text}>
+                        Authenticate
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            </View>);
+        }
+        if(this.state.email_code)
+        {
+            return(
+            <View style={{flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}>
+                <View style={{height: 50}}>
+                    <Icon
+                        ios={'ios-lock'}
+                        android={'md-lock'}
+                        style={LoginScreenStyles.inlineImg}
+                    />
+                    <TextInput
+                        style={LoginScreenStyles.input}
+                        onChangeText={(text) => this.setState({username: text})}
+                        placeholder="Code sent to E-mail"
+                        placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
+                        autoCapitalize="none"
+                        autoCorrect={true}
+                        keyboardType="email-address"
+                        returnKeyType="next"
+                        blurOnSubmit={false}
+                        enablesReturnKeyAutomatically={true}
+                        underlineColorAndroid='rgba(0,0,0,0)'
+                        value={this.state.username}
+                        keyboardShouldPersistTaps={'handled'}
+                    />
+                </View>
+                <View style={{height: 50}}>
+                    <TouchableOpacity style={LoginScreenStyles.button}
+                        onPress={() => {
+                                AsyncStorageManager.storeOnAssyncStorage(this.state.info.email, this.state.info.name,
+                                    this.state.info.id, this.state.info.token);
+                                this.resetNavigation('EntriesScreen');
+                        }}>
+                        <Text style={ButtonStyles.text}>
+                        Authenticate
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            </View>);
+        }
     }
 
     renderLogin(){

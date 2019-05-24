@@ -63,10 +63,10 @@ export class DBInterface {
     static insertDump(dump) {
         return new Promise(function (resolve, reject) {
             DBInterface.db.transaction((tx) => {
-                for (let i = 0; i < dump.length; i++) {
+                for (let i = 0; i < dump.logins.length; i++) {
                     tx.executeSql('INSERT OR REPLACE INTO login (source, ip, date, time) '
-                        + ' VALUES (\"' + dump[i].source + '\", \"' + dump[i].ip + '\",'
-                        + ' \"' + dump[i].date + '\", \"' + dump[i].time + '\");');
+                        + ' VALUES (\"' + dump.logins[i].source + '\", \"' + dump.logins[i].ip + '\",'
+                        + ' \"' + dump.logins[i].date + '\", \"' + dump.logins[i].time + '\");');
                 }
             }, () => {
                 //erro
