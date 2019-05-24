@@ -98,14 +98,17 @@ export default class LoginScreen extends Component {
     };
 
     handleAuthenticationAttempted = (error) => {
-        Alert.alert(
-            'Error',
-            "Fingerprint read failed.",
-            [
-                {text: 'Ok'},
-            ],
-            {cancelable: false}
-        );
+        if(this.state.checkPin)
+        {
+            Alert.alert(
+                'Error',
+                "Fingerprint read failed.",
+                [
+                    {text: 'Ok'},
+                ],
+                {cancelable: false}
+            );
+        }
     };
 
     handleRegister() {
