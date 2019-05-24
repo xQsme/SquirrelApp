@@ -370,6 +370,12 @@ export default class LoginScreen extends Component {
                     justifyContent: 'center',
                     alignItems: 'center',
                 }}>
+                    <View style={{paddingTop:30, paddingBottom: 30}}>
+                        <Image
+                            source={logo}
+                            style={{width: 200, height: 200}}
+                        />
+                    </View>
                     <View style={{height: 50}}>
                         <Icon
                             ios={'ios-lock'}
@@ -637,6 +643,12 @@ export default class LoginScreen extends Component {
                 justifyContent: 'center',
                 alignItems: 'center',
             }}>
+                <View style={{paddingTop:30, paddingBottom: 30}}>
+                    <Image
+                        source={logo}
+                        style={{width: 200, height: 200}}
+                    />
+                </View>
                 <View style={{height: 50}}>
                     <Icon
                         ios={'ios-lock'}
@@ -697,6 +709,12 @@ export default class LoginScreen extends Component {
                 justifyContent: 'center',
                 alignItems: 'center',
             }}>
+                <View style={{paddingTop:30, paddingBottom: 30}}>
+                    <Image
+                        source={logo}
+                        style={{width: 200, height: 200}}
+                    />
+                </View>
                 <View style={{height: 50}}>
                     <Icon
                         ios={'ios-lock'}
@@ -743,6 +761,12 @@ export default class LoginScreen extends Component {
                 justifyContent: 'center',
                 alignItems: 'center',
             }}>
+                <View style={{paddingTop:30, paddingBottom: 30}}>
+                    <Image
+                        source={logo}
+                        style={{width: 200, height: 200}}
+                    />
+                </View>
                 <View style={{height: 50}}>
                     <TouchableOpacity style={LoginScreenStyles.button}
                         onPress={() => {
