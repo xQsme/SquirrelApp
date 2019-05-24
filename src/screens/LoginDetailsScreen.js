@@ -98,8 +98,28 @@ export default class LoginDetailsScreen extends Component {
                                               onPress={() => {
                                                 AsyncStorageManager.clearUserData()
                                                 .then((r) => {
-                                                    DBInterface.dropTables()
-                                                    this.props.navigation.navigate("LoginScreen");
+                                                    AsyncStorageManager.getUserPin()
+                                                    .then((t) => {
+                                                        if (t == null) 
+                                                        {
+                                                            Alert.alert(
+                                                                'Error',
+                                                                "Pin not set.",
+                                                                [
+                                                                    {text: 'Ok'},
+                                                                ],
+                                                                {cancelable: false}
+                                                            );
+                                                        } 
+                                                        else 
+                                                        {
+                                                            AsyncStorageManager.setUserPin(t);
+                                                            DBInterface.dropTables()
+                                                            this.props.navigation.navigate("LoginScreen");
+                                                        }
+                                                    }).catch((e) => {
+                                                    });
+
                                                 });
                                               }}>
                                 <Text style={LoginDetailsScreenStyles.buttonText}>

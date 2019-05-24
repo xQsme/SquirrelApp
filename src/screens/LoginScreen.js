@@ -12,6 +12,7 @@ import {DBInterface} from "../utils/db/DBInterface";
 import {AsyncStorageManager} from "../utils/AsyncStorageManager";
 import logo from '../utils/images/logo.png';
 import sqrl from '../utils/images/sqrl.png';
+import FingerprintScanner from 'react-native-fingerprint-scanner';
 
 const Dimensions = require('Dimensions');
 const DEVICE_WIDTH = Dimensions.get('window').width;
@@ -40,8 +41,12 @@ export default class LoginScreen extends Component {
             code_1: null,
             code_2: null,
             code_3: null,
+            code_4: null,
             failed: false,
             red: false,
+            checkPin: false,
+            pinCheck: false,
+            setPin: false,
         };
 
         AsyncStorageManager.getUserToken()
@@ -51,7 +56,7 @@ export default class LoginScreen extends Component {
                         isLoading: false
                     });
                     //already logged in then goes to the surveysScreen and clears navigation, so that user cant go back to login screen
-                    this.resetNavigation('EntriesScreen')
+                    this.redirect(false);
                 } else (
                     this.setState({
                         isLoading: false
@@ -69,15 +74,29 @@ export default class LoginScreen extends Component {
                 this.state.status = isConnected
             }
         );
+        FingerprintScanner
+            .authenticate({ onAttempt: this.handleAuthenticationAttempted })
+            .then(() => {
+            })
+            .catch((error) => {
+            });
     }
 
     componentWillUnmount() {
         NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectionChange);
+        FingerprintScanner.release();
     }
 
     handleConnectionChange = (isConnected) => {
         this.state.status = isConnected;
     };
+
+    handleAuthenticationAttempted = (error) => {
+        if(this.state.checkPin)
+        {
+            this.setState({pinCheck: true});
+        }
+      };
 
     handleRegister() {
 
@@ -87,20 +106,9 @@ export default class LoginScreen extends Component {
                 loading: true,
             });
 
-            //Open db Connection
             DBInterface.openDBConnection();
 
-            //Drop Tables ---- ONLY USED IF NEEDED TO UPDATE db
-            //DBInterface.dropTables();
-
-            //Create Tables
             DBInterface.createTables();
-            /*
-            AsyncStorageManager.storeOnAssyncStorage(this.state.email,
-                this.state.email,
-                "1",
-                "123");
-            this.resetNavigation('EntriesScreen');*/
 
             LoginManagerApiFacade.register(this.state.username, this.state.email, this.state.password)
                 .then((r) => {
@@ -158,20 +166,10 @@ export default class LoginScreen extends Component {
                 loading: true,
             });
 
-            //Open db Connection
+
             DBInterface.openDBConnection();
 
-            //Drop Tables ---- ONLY USED IF NEEDED TO UPDATE db
-            //DBInterface.dropTables();
-
-            //Create Tables
             DBInterface.createTables();
-            /*
-            AsyncStorageManager.storeOnAssyncStorage(this.state.email,
-                this.state.email,
-                "1",
-                "123");
-            this.resetNavigation('EntriesScreen');*/
 
             LoginManagerApiFacade.login(this.state.email, this.state.password)
                 .then((r) => {
@@ -183,55 +181,19 @@ export default class LoginScreen extends Component {
                                    token: JSON.parse(r._bodyText).token,
                                    id: JSON.stringify(JSON.parse(r._bodyText).user_id)}
                         });
-                        //get data with the token and insertDump
-                        LoginManagerApiFacade.dump(JSON.parse(r._bodyText).token)
-                            .then((responseJson) => {
-                                DBInterface.insertDump(responseJson)
-                                    .then((r => {
-                                        if(responseJson.auth.google == '' && responseJson.auth.fido == '' && responseJson.auth.email == '')
-                                        {
-                                            AsyncStorageManager.storeOnAssyncStorage(this.state.info.email, this.state.info.name,
-                                                this.state.info.id, this.state.info.token);
-                                            this.resetNavigation('EntriesScreen');
-                                        }
-                                        else
-                                        {
-                                            this.setState({
-                                                google: responseJson.auth.google,
-                                                fido: responseJson.auth.fido,
-                                                email_code: responseJson.auth.email,
-                                                login: true
-                                            })
-                                        }
-                                    })).catch((e) => {
-                                    Alert.alert(
-                                        'Error',
-                                        "Error inserting information.",
-                                        [
-                                            {text: 'Ok'},
-                                        ],
-                                        {cancelable: false}
-                                    );
-                                    this.setState({
-                                        loading: false,
-                                    });
-                                    AsyncStorageManager.clearUserData()
-                                });
-                            })
-                            .catch(e => {
-                                Alert.alert(
-                                    'Error',
-                                    "Error obtaining data from server.",
-                                    [
-                                        {text: 'Ok'},
-                                    ],
-                                    {cancelable: false}
-                                );
-                                this.setState({
-                                    loading: false,
-                                });
-                                AsyncStorageManager.clearUserData()
+                        if(!JSON.parse(r._bodyText).google && !JSON.parse(r._bodyText).fido && !JSON.parse(r._bodyText).email_code)
+                        {
+                            this.redirect(true);
+                        }
+                        else
+                        {
+                            this.setState({
+                                google: JSON.parse(r._bodyText).google,
+                                fido: JSON.parse(r._bodyText).fido,
+                                email_code: JSON.parse(r._bodyText).email_code,
+                                login: true
                             });
+                        }
                     } else {
                         Alert.alert(
                             'Error',
@@ -382,6 +344,152 @@ export default class LoginScreen extends Component {
     }
 
     render() {
+        if(this.state.setPin)
+        {
+            return(
+                <KeyboardAvoidingView style={{flex: 1, backgroundColor: 'rgb(212, 157, 65)'}} behavior={isIos ? 'padding' : null} >
+                    <ScrollView contentContainerStyle={{
+                        flexGrow: 1,
+                        alignContent: 'center',
+                        alignItems: 'center',
+                        }}>
+                <View style={{flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}>
+                    <View style={{height: 50}}>
+                        <Icon
+                            ios={'ios-lock'}
+                            android={'md-lock'}
+                            style={LoginScreenStyles.inlineImg}
+                        />
+                        <TextInput
+                            style={LoginScreenStyles.input}
+                            onChangeText={(text) => this.setState({code_4: text})}
+                            placeholder="Pin Code"
+                            placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
+                            autoCapitalize="none"
+                            autoCorrect={true}
+                            keyboardType="number-pad"
+                            returnKeyType="next"
+                            blurOnSubmit={false}
+                            enablesReturnKeyAutomatically={true}
+                            underlineColorAndroid='rgba(0,0,0,0)'
+                            value={this.state.code_4}
+                            keyboardShouldPersistTaps={'handled'}
+                        />
+                    </View>
+                    <View style={{height: 50}}>
+                        <TouchableOpacity style={LoginScreenStyles.button}
+                            onPress={() => {
+                                if(this.state.code_4.length < 4 || this.state.code_4.length > 6)
+                                {
+                                    Alert.alert(
+                                        'Error',
+                                        "Pin must be between 4 and 6 numbers long.",
+                                        [
+                                            {text: 'Ok'},
+                                        ],
+                                        {cancelable: false}
+                                    );
+                                }
+                                else
+                                {
+                                    AsyncStorageManager.setUserPin(this.state.code_4);
+                                    this.setState({pinCheck: true});
+                                    this.redirect(false);
+                                }
+                            }}>
+                            <Text style={ButtonStyles.text}>
+                            Set Pin
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                    <Text style={{color: this.state.red ? 'red' : 'black', fontSize: 20}}>{this.state.failed ? 'Wrong code, try again' : ''}</Text>
+                </View>
+                </ScrollView>
+                </KeyboardAvoidingView>);
+        }
+        if(this.state.checkPin)
+        {
+            return(
+                <KeyboardAvoidingView style={{flex: 1, backgroundColor: 'rgb(212, 157, 65)'}} behavior={isIos ? 'padding' : null} >
+                    <ScrollView contentContainerStyle={{
+                        flexGrow: 1,
+                        alignContent: 'center',
+                        alignItems: 'center',
+                        }}>
+                <View style={{flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}>
+                    <View style={{height: 50}}>
+                        <Icon
+                            ios={'ios-lock'}
+                            android={'md-lock'}
+                            style={LoginScreenStyles.inlineImg}
+                        />
+                        <TextInput
+                            style={LoginScreenStyles.input}
+                            onChangeText={(text) => this.setState({code_1: text})}
+                            placeholder="Pin Code"
+                            placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
+                            autoCapitalize="none"
+                            autoCorrect={true}
+                            keyboardType="number-pad"
+                            returnKeyType="next"
+                            blurOnSubmit={false}
+                            enablesReturnKeyAutomatically={true}
+                            underlineColorAndroid='rgba(0,0,0,0)'
+                            value={this.state.code_1}
+                            keyboardShouldPersistTaps={'handled'}
+                        />
+                    </View>
+                    <View style={{height: 50}}>
+                        <TouchableOpacity style={LoginScreenStyles.button}
+                            onPress={() => {
+                                AsyncStorageManager.getUserPin()
+                                .then((t) => {
+                                    if (t == null) 
+                                    {
+                                        Alert.alert(
+                                            'Error',
+                                            "Pin not set.",
+                                            [
+                                                {text: 'Ok'},
+                                            ],
+                                            {cancelable: false}
+                                        );
+                                    } 
+                                    else 
+                                    {
+                                        if(this.state.code_1 == t)
+                                        {
+                                            this.setState({pinCheck: true});
+                                            this.redirect(false);
+                                        }
+                                        else
+                                        {
+                                            this.setState({failed:true,
+                                                red: true});
+                                            setTimeout(()=>{
+                                                this.setState({red: false});
+                                            }, 2000);
+                                        }
+                                    }
+                                }).catch((e) => {
+                                });
+                            }}>
+                            <Text style={ButtonStyles.text}>
+                            Authenticate
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                    <Text style={{color: this.state.red ? 'red' : 'black', fontSize: 20}}>{this.state.failed ? 'Wrong code, try again' : ''}</Text>
+                </View>
+                </ScrollView>
+                </KeyboardAvoidingView>);
+        }
         if(!this.state.login)
         {
             return (
@@ -415,6 +523,90 @@ export default class LoginScreen extends Component {
                         {this.render2FA()}
                     </ScrollView>
                 </KeyboardAvoidingView>);
+    }
+
+    redirect(auth)
+    {
+        if(auth)
+        {
+            AsyncStorageManager.storeOnAssyncStorage(this.state.info.email, this.state.info.name,
+                this.state.info.id, this.state.info.token);
+            LoginManagerApiFacade.dump(this.state.info.token)
+                .then((responseJson) => {
+                    DBInterface.insertDump(responseJson)
+                        .then((r => {
+                            AsyncStorageManager.getUserPin()
+                            .then((t) => {
+                                if (t == null) 
+                                {
+                                    this.setState({setPin: true});
+                                } 
+                                else 
+                                {
+                                    this.resetNavigation('EntriesScreen');
+
+                                }
+                            }).catch((e) => {
+                            });
+                        })).catch((e) => {
+                        Alert.alert(
+                            'Error',
+                            "Error inserting information.",
+                            [
+                                {text: 'Ok'},
+                            ],
+                            {cancelable: false}
+                        );
+                        this.setState({
+                            loading: false,
+                        });
+                        AsyncStorageManager.clearUserData()
+                    });
+                })
+                .catch(e => {
+                    Alert.alert(
+                        'Error',
+                        "Error obtaining data from server.",
+                        [
+                            {text: 'Ok'},
+                        ],
+                        {cancelable: false}
+                    );
+                    this.setState({
+                        loading: false,
+                    });
+                    AsyncStorageManager.clearUserData()
+                });
+        }
+        else
+        {
+            AsyncStorageManager.getUserPin()
+            .then((t) => {
+                if (t == null) 
+                {
+                    Alert.alert(
+                        'Error',
+                        "Pin not set.",
+                        [
+                            {text: 'Ok'},
+                        ],
+                        {cancelable: false}
+                    );
+                } 
+                else 
+                {
+                    if(this.state.pinCheck)
+                    {
+                        this.resetNavigation('EntriesScreen');
+                    }
+                    else
+                    {
+                        this.setState({checkPin: true});
+                    }
+                }
+            }).catch((e) => {
+            });
+        }
     }
 
     render2FA()
@@ -454,13 +646,11 @@ export default class LoginScreen extends Component {
                             LoginManagerApiFacade.google(this.state.info.token, this.state.code_1)
                                 .then((r) => {
                                     if (r.status === 200) {
-                                        this.setState({google: '',
+                                        this.setState({google: false,
                                             failed: false})
-                                        if(this.state.fido == '' && this.state.email_code == '')
+                                        if(!this.state.fido && !this.state.email_code)
                                         { 
-                                            AsyncStorageManager.storeOnAssyncStorage(this.state.info.email, this.state.info.name,
-                                                this.state.info.id, this.state.info.token);
-                                            this.resetNavigation('EntriesScreen');
+                                            this.redirect(true);
                                         }
                                     }
                                     else
@@ -513,12 +703,10 @@ export default class LoginScreen extends Component {
                 <View style={{height: 50}}>
                     <TouchableOpacity style={LoginScreenStyles.button}
                         onPress={() => {
-                            this.setState({fido: ''})
-                            if(this.state.email_code == '')
+                            this.setState({fido: false})
+                            if(!this.state.email_code)
                             {
-                                AsyncStorageManager.storeOnAssyncStorage(this.state.info.email, this.state.info.name,
-                                    this.state.info.id, this.state.info.token);
-                                this.resetNavigation('EntriesScreen');
+                                this.redirect(true);
                             }
                         }}>
                         <Text style={ButtonStyles.text}>
@@ -598,9 +786,7 @@ export default class LoginScreen extends Component {
                             LoginManagerApiFacade.validateEmail(this.state.info.token, this.state.code_3)
                                 .then((r) => {
                                     if (r.status === 200) {  
-                                        AsyncStorageManager.storeOnAssyncStorage(this.state.info.email, this.state.info.name,
-                                            this.state.info.id, this.state.info.token);
-                                        this.resetNavigation('EntriesScreen');
+                                        this.redirect(true);
                                     }
                                     else
                                     {

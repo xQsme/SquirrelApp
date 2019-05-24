@@ -4,6 +4,7 @@ let userEmail = null;
 let userId = null;
 let userName = null;
 let userToken = null;
+let userPin = null;
 
 export class AsyncStorageManager {
 
@@ -96,6 +97,31 @@ export class AsyncStorageManager {
                 } else {
                     resolve(userEmail);
                 }
+            });
+    }
+
+    static getUserPin() {
+        return new Promise(
+            function (resolve, reject) {
+                if (userPin == null) {
+                    AsyncStorage.getItem("@LoginManager" + ":pin")
+                        .then((pin) => {
+                            userPin = pin;
+                            resolve(userPin);
+                        }).catch((e) => {
+                        reject(e)
+                    });
+                } else {
+                    resolve(userPin);
+                }
+            });
+    }
+    
+    static setUserPin(pin) {
+        AsyncStorage.setItem("@LoginManager" + ':pin', pin)
+            .then(() => {
+            })
+            .catch((error) => {
             });
     }
 
