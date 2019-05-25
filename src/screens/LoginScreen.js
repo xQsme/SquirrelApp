@@ -12,6 +12,8 @@ import {DBInterface} from "../utils/db/DBInterface";
 import {AsyncStorageManager} from "../utils/AsyncStorageManager";
 import logo from '../utils/images/logo.png';
 import sqrl from '../utils/images/sqrl.png';
+import mail from '../utils/images/mail.png';
+import auth from '../utils/images/auth.png';
 import fingerprint from '../utils/images/fingerprint.png';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 
@@ -405,7 +407,7 @@ export default class LoginScreen extends Component {
                                 {
                                     Alert.alert(
                                         'Error',
-                                        "Pin must be between 4 and 6 numbers long.",
+                                        "Pin must be between 4 and 6 digits long.",
                                         [
                                             {text: 'Ok'},
                                         ],
@@ -463,7 +465,8 @@ export default class LoginScreen extends Component {
                             autoCorrect={true}
                             keyboardType="number-pad"
                             returnKeyType="done"
-                            blurOnSubmit={false}
+                            blurOnSubmit={true}
+                            secureTextEntry={true}
                             enablesReturnKeyAutomatically={true}
                             underlineColorAndroid='rgba(0,0,0,0)'
                             value={this.state.code_1}
@@ -645,7 +648,7 @@ export default class LoginScreen extends Component {
             }}>
                 <View style={{paddingTop:30, paddingBottom: 30}}>
                     <Image
-                        source={logo}
+                        source={auth}
                         style={{width: 200, height: 200}}
                     />
                 </View>
@@ -763,7 +766,7 @@ export default class LoginScreen extends Component {
             }}>
                 <View style={{paddingTop:30, paddingBottom: 30}}>
                     <Image
-                        source={logo}
+                        source={mail}
                         style={{width: 200, height: 200}}
                     />
                 </View>

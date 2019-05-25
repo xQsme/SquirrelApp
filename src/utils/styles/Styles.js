@@ -132,6 +132,16 @@ export const LoginScreenStyles = StyleSheet.create({
         fontSize: 16,
         color: '#000000',
     },
+    inputDark: {
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        width: DEVICE_WIDTH - 40,
+        height: 40,
+        marginHorizontal: 20,
+        paddingLeft: 45,
+        borderRadius: 20,
+        fontSize: 16,
+        color: '#FFFFFF',
+    },
     inlineImg: {
         position: 'absolute',
         zIndex: 99,
