@@ -17,8 +17,6 @@ import auth from '../utils/images/auth.png';
 import fingerprint from '../utils/images/fingerprint.png';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 
-const Dimensions = require('Dimensions');
-const DEVICE_WIDTH = Dimensions.get('window').width;
 let isIos = require('react-native').Platform.OS === 'ios';
 
 export default class LoginScreen extends Component {
@@ -125,9 +123,10 @@ export default class LoginScreen extends Component {
 
             DBInterface.createTables();
 
-            LoginManagerApiFacade.register(this.state.username, this.state.email, this.state.password)
+            LoginManagerApiFacade.register(this.state.username, this.state.email, this.state.password, this.state.pin)
                 .then((r) => {
                     if (r.status === 200) {
+                        AsyncStorageManager.setUserPin(this.state.pin);
                         this.handleLogin();
                     } else {
                         Alert.alert(
@@ -277,10 +276,10 @@ export default class LoginScreen extends Component {
         {
             return(
                 <View>
-                    <View style={{height: 75}}> 
+                    <View style={{height: 50}}> 
                         <TouchableOpacity style={LoginScreenStyles.button}
                             onPress={() => {
-                                if (this.state.username != null && this.state.email != null && this.state.password != null && this.state.passwordConf != null) {
+                                if (this.state.username != null && this.state.email != null && this.state.password != null && this.state.passwordConf != null && this.state.pin != null) {
                                     if(this.state.password == this.state.passwordConf)
                                     {
                                         this.handleRegister();
@@ -478,6 +477,7 @@ export default class LoginScreen extends Component {
                             onPress={() => {
                                 AsyncStorageManager.getUserPin()
                                 .then((t) => {
+                                    console.log(t);
                                     if (t == null) 
                                     {
                                         Alert.alert(
@@ -933,7 +933,7 @@ export default class LoginScreen extends Component {
                             value={this.state.password}
                         />
                     </View>
-                    <View style={{height: 80}}>
+                    <View style={{height: 50}}>
                         <Icon
                             ios={'ios-lock'}
                             android={'md-lock'}
@@ -946,11 +946,32 @@ export default class LoginScreen extends Component {
                             placeholder="Password Confirmation"
                             placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
                             keyboardType="default"
-                            returnKeyType="done"
+                            returnKeyType="next"
+                            onSubmitEditing={(event) => { 
+                                this.refs.pin.focus(); 
+                              }}
                             blurOnSubmit={true}
                             secureTextEntry={true}
                             underlineColorAndroid='rgba(0,0,0,0)'
                             value={this.state.passwordConf}
+                        />
+                    </View>
+                    <View style={{height: 50}}>
+                        <Icon
+                            ios={'ios-lock'}
+                            android={'md-lock'}
+                            style={LoginScreenStyles.inlineImg}
+                        />
+                        <TextInput
+                            style={LoginScreenStyles.input}
+                            ref='pin'
+                            onChangeText={(text) => this.setState({pin: text})}
+                            placeholder="Pin Code"
+                            placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
+                            keyboardType="number-pad"
+                            returnKeyType="done"
+                            underlineColorAndroid='rgba(0,0,0,0)'
+                            value={this.state.pin}
                         />
                     </View>
                 </View>);

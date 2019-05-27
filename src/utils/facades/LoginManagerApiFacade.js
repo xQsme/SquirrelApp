@@ -1,4 +1,4 @@
-const URL_BASE = 'http://192.168.1.69:8000/api/';
+const URL_BASE = 'https://squirrel-mcif.me/api/';
 /**
  * The URL for the api method to dump the entire database
  * @type {string} - URL
@@ -114,7 +114,7 @@ export class LoginManagerApiFacade {
             })
     }
 
-    static register(username, email, password) {
+    static register(username, email, password, pin) {
         return new Promise(
             function (resolve, reject) {
                 post(URL_POST_REGISTER,
@@ -126,7 +126,8 @@ export class LoginManagerApiFacade {
                     JSON.stringify({
                         name: username,
                         email: email,
-                        password: password
+                        password: password,
+                        pin: pin
                     })
                 )
                     .then((r) => {

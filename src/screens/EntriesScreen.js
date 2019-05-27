@@ -6,8 +6,6 @@ import {DBQueryHelper} from "../utils/db/DBQueryHelper";
 import BaseScreen from "./BaseScreen";
 import {TouchableOpacity, Image} from "react-native";
 
-let isIos = require('react-native').Platform.OS === 'ios';
-
 export default class EntriesScreen extends Component {
 
     static navigationOptions = ({navigation}) => {
