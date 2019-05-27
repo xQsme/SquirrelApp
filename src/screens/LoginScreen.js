@@ -204,9 +204,23 @@ export default class LoginScreen extends Component {
                             this.setState({
                                 google: JSON.parse(r._bodyText).google,
                                 fido: JSON.parse(r._bodyText).fido,
-                                email_code: JSON.parse(r._bodyText).email_code,
-                                login: true
+                                email_code: JSON.parse(r._bodyText).email_code
                             });
+                            if(this.state.email_code)
+                            {
+                                LoginManagerApiFacade.email(this.state.info.token)
+                                .then((r) => {
+                                    this.setState({
+                                        login: true
+                                    });
+                                });
+                            }
+                            else
+                            {
+                                this.setState({
+                                    login: true
+                                });
+                            }
                         }
                     } else {
                         Alert.alert(
@@ -387,16 +401,12 @@ export default class LoginScreen extends Component {
                             style={LoginScreenStyles.input}
                             onChangeText={(text) => this.setState({code_4: text})}
                             placeholder="Pin Code"
-                            placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
                             autoCapitalize="none"
-                            autoCorrect={true}
+                            placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
                             keyboardType="number-pad"
                             returnKeyType="done"
-                            blurOnSubmit={false}
-                            enablesReturnKeyAutomatically={true}
                             underlineColorAndroid='rgba(0,0,0,0)'
                             value={this.state.code_4}
-                            keyboardShouldPersistTaps={'handled'}
                         />
                     </View>
                     <View style={{height: 50}}>
@@ -460,16 +470,11 @@ export default class LoginScreen extends Component {
                             onChangeText={(text) => this.setState({code_1: text})}
                             placeholder="Pin Code"
                             placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
-                            autoCapitalize="none"
-                            autoCorrect={true}
                             keyboardType="number-pad"
                             returnKeyType="done"
-                            blurOnSubmit={true}
                             secureTextEntry={true}
-                            enablesReturnKeyAutomatically={true}
                             underlineColorAndroid='rgba(0,0,0,0)'
                             value={this.state.code_1}
-                            keyboardShouldPersistTaps={'handled'}
                         />
                     </View>
                     <View style={{height: 50}}>
@@ -663,15 +668,10 @@ export default class LoginScreen extends Component {
                         onChangeText={(text) => this.setState({code_1: text})}
                         placeholder="Google Authenticator Code"
                         placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
-                        autoCapitalize="none"
-                        autoCorrect={true}
-                        keyboardType="email-address"
-                        returnKeyType="next"
-                        blurOnSubmit={false}
-                        enablesReturnKeyAutomatically={true}
+                        keyboardType="number-pad"
+                        returnKeyType="done"
                         underlineColorAndroid='rgba(0,0,0,0)'
                         value={this.state.code_1}
-                        keyboardShouldPersistTaps={'handled'}
                     />
                 </View>
                 <View style={{height: 50}}>
@@ -729,15 +729,10 @@ export default class LoginScreen extends Component {
                         onChangeText={(text) => this.setState({code_2: text})}
                         placeholder="FIDO Authenticator Code"
                         placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
-                        autoCapitalize="none"
-                        autoCorrect={true}
-                        keyboardType="email-address"
-                        returnKeyType="next"
-                        blurOnSubmit={false}
-                        enablesReturnKeyAutomatically={true}
+                        keyboardType="number-pad"
+                        returnKeyType="done"
                         underlineColorAndroid='rgba(0,0,0,0)'
                         value={this.state.code_2}
-                        keyboardShouldPersistTaps={'handled'}
                     />
                 </View>
                 <View style={{height: 50}}>
@@ -800,7 +795,7 @@ export default class LoginScreen extends Component {
                             });
                         }}>
                         <Text style={ButtonStyles.text}>
-                        Send E-mail
+                        Resend E-mail
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -814,16 +809,12 @@ export default class LoginScreen extends Component {
                         style={LoginScreenStyles.input}
                         onChangeText={(text) => this.setState({code_3: text})}
                         placeholder="Code sent to E-mail"
-                        placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
                         autoCapitalize="none"
-                        autoCorrect={true}
-                        keyboardType="email-address"
-                        returnKeyType="next"
-                        blurOnSubmit={false}
-                        enablesReturnKeyAutomatically={true}
+                        placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
+                        keyboardType="default"
+                        returnKeyType="done"
                         underlineColorAndroid='rgba(0,0,0,0)'
                         value={this.state.code_3}
-                        keyboardShouldPersistTaps={'handled'}
                     />
                 </View>
                 <View style={{height: 50}}>
@@ -831,7 +822,11 @@ export default class LoginScreen extends Component {
                         onPress={() => {
                             LoginManagerApiFacade.validateEmail(this.state.info.token, this.state.code_3)
                                 .then((r) => {
-                                    if (r.status === 200) {  
+                                    if (r.status === 200) {
+                                        this.setState({
+                                            email_code: false,
+                                            failed: false
+                                        });
                                         this.redirect(true);
                                     }
                                     else
@@ -871,17 +866,13 @@ export default class LoginScreen extends Component {
                             placeholder="Username"
                             placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
                             autoCapitalize="none"
-                            autoCorrect={true}
-                            keyboardType="email-address"
+                            keyboardType="default"
                             returnKeyType="next"
-                            blurOnSubmit={false}
                             onSubmitEditing={(event) => { 
                                 this.refs.email.focus(); 
                               }}
-                            enablesReturnKeyAutomatically={true}
                             underlineColorAndroid='rgba(0,0,0,0)'
                             value={this.state.username}
-                            keyboardShouldPersistTaps={'handled'}
                         />
                     </View>
                     <View style={{height: 50}}>
@@ -897,17 +888,13 @@ export default class LoginScreen extends Component {
                             placeholder="E-Mail"
                             placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
                             autoCapitalize="none"
-                            autoCorrect={true}
                             keyboardType="email-address"
                             returnKeyType="next"
-                            blurOnSubmit={false}
                             onSubmitEditing={(event) => { 
                                 this.refs.password.focus(); 
                               }}
-                            enablesReturnKeyAutomatically={true}
                             underlineColorAndroid='rgba(0,0,0,0)'
                             value={this.state.email}
-                            keyboardShouldPersistTaps={'handled'}
                         />
                     </View>
                     <View style={{height: 50}}>
@@ -922,12 +909,12 @@ export default class LoginScreen extends Component {
                             onChangeText={(text) => this.setState({password: text})}
                             placeholder="Password"
                             placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
+                            autoCapitalize="none"
                             keyboardType="default"
                             returnKeyType="next"
                             onSubmitEditing={(event) => { 
                                 this.refs.passwordconf.focus(); 
                               }}
-                            blurOnSubmit={true}
                             secureTextEntry={true}
                             underlineColorAndroid='rgba(0,0,0,0)'
                             value={this.state.password}
@@ -945,12 +932,12 @@ export default class LoginScreen extends Component {
                             onChangeText={(text) => this.setState({passwordConf: text})}
                             placeholder="Password Confirmation"
                             placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
+                            autoCapitalize="none"
                             keyboardType="default"
                             returnKeyType="next"
                             onSubmitEditing={(event) => { 
                                 this.refs.pin.focus(); 
                               }}
-                            blurOnSubmit={true}
                             secureTextEntry={true}
                             underlineColorAndroid='rgba(0,0,0,0)'
                             value={this.state.passwordConf}
@@ -990,17 +977,13 @@ export default class LoginScreen extends Component {
                         placeholder="Username or E-Mail"
                         placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
                         autoCapitalize="none"
-                        autoCorrect={true}
                         keyboardType="email-address"
                         returnKeyType="next"
-                        blurOnSubmit={false}
                         onSubmitEditing={(event) => { 
                             this.refs.pass.focus(); 
                           }}
-                        enablesReturnKeyAutomatically={true}
                         underlineColorAndroid='rgba(0,0,0,0)'
                         value={this.state.email}
-                        keyboardShouldPersistTaps={'handled'}
                     />
                 </View>
 
@@ -1016,9 +999,9 @@ export default class LoginScreen extends Component {
                         onChangeText={(text) => this.setState({password: text})}
                         placeholder="Password"
                         placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
+                        autoCapitalize="none"
                         keyboardType="default"
                         returnKeyType="done"
-                        blurOnSubmit={true}
                         secureTextEntry={true}
                         underlineColorAndroid='rgba(0,0,0,0)'
                         value={this.state.password}
