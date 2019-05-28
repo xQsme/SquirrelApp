@@ -798,11 +798,15 @@ export default class LoginScreen extends Component {
                                     }
                                     else
                                     {
-                                        this.setState({failed:true,
-                                                       red: true});
-                                        setTimeout(()=>{
-                                            this.setState({red: false});
-                                        }, 2000);
+                                        console.log(r);
+                                        Alert.alert(
+                                            'Error',
+                                            r._bodyText.split('"message":"')[1].split('"')[0],
+                                            [
+                                                {text: 'Ok'},
+                                            ],
+                                            {cancelable: false}
+                                        );
                                     }
                                 });
                         }}>
