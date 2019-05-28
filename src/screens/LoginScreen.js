@@ -56,7 +56,6 @@ export default class LoginScreen extends Component {
                     this.setState({
                         isLoading: false
                     });
-                    //already logged in then goes to the surveysScreen and clears navigation, so that user cant go back to login screen
                     this.redirect(false);
                 } else (
                     this.setState({
@@ -112,17 +111,12 @@ export default class LoginScreen extends Component {
     };
 
     handleRegister() {
-
-        //if network connected
         if (this.state.status) {
             this.setState({
                 loading: true,
             });
-
             DBInterface.openDBConnection();
-
             DBInterface.createTables();
-
             LoginManagerApiFacade.register(this.state.username, this.state.email, this.state.password, this.state.pin)
                 .then((r) => {
                     if (r.status === 200) {
@@ -141,7 +135,6 @@ export default class LoginScreen extends Component {
                             loading: false,
                         });
                     }
-
                 }).catch((error) => {
                 Alert.alert(
                     'Error',
@@ -156,7 +149,6 @@ export default class LoginScreen extends Component {
                 });
             });
         }
-        //if network not connected
         else {
             Alert.alert(
                 'Error',
@@ -173,18 +165,12 @@ export default class LoginScreen extends Component {
     }
 
     handleLogin() {
-
-        //if network connected
         if (this.state.status) {
             this.setState({
                 loading: true,
             });
-
-
             DBInterface.openDBConnection();
-
             DBInterface.createTables();
-
             LoginManagerApiFacade.login(this.state.email, this.state.password)
                 .then((r) => {
                     if (r.status === 200) {
@@ -204,23 +190,9 @@ export default class LoginScreen extends Component {
                             this.setState({
                                 google: JSON.parse(r._bodyText).google,
                                 fido: JSON.parse(r._bodyText).fido,
-                                email_code: JSON.parse(r._bodyText).email_code
+                                email_code: JSON.parse(r._bodyText).email_code,
+                                login: true
                             });
-                            if(this.state.email_code)
-                            {
-                                LoginManagerApiFacade.email(this.state.info.token)
-                                .then((r) => {
-                                    this.setState({
-                                        login: true
-                                    });
-                                });
-                            }
-                            else
-                            {
-                                this.setState({
-                                    login: true
-                                });
-                            }
                         }
                     } else {
                         Alert.alert(
@@ -250,7 +222,6 @@ export default class LoginScreen extends Component {
                 });
             });
         }
-        //if network not connected
         else {
             Alert.alert(
                 'Error',
@@ -275,10 +246,6 @@ export default class LoginScreen extends Component {
         });
         this.props.navigation.dispatch(resetAction);
     }
-
-    _next = () => {
-        this._passwordInput && this._passwordInput.focus();
-    };
 
     handleActivityIndicator() 
     {
@@ -795,7 +762,7 @@ export default class LoginScreen extends Component {
                             });
                         }}>
                         <Text style={ButtonStyles.text}>
-                        Resend E-mail
+                        Send E-mail
                         </Text>
                     </TouchableOpacity>
                 </View>
