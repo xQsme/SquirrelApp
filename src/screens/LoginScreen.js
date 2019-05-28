@@ -370,7 +370,7 @@ export default class LoginScreen extends Component {
                             placeholder="Pin Code"
                             autoCapitalize="none"
                             placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
-                            keyboardType="number-pad"
+                            keyboardType="default"
                             returnKeyType="done"
                             underlineColorAndroid='rgba(0,0,0,0)'
                             value={this.state.code_4}
@@ -437,7 +437,7 @@ export default class LoginScreen extends Component {
                             onChangeText={(text) => this.setState({code_1: text})}
                             placeholder="Pin Code"
                             placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
-                            keyboardType="number-pad"
+                            keyboardType="default"
                             returnKeyType="done"
                             secureTextEntry={true}
                             underlineColorAndroid='rgba(0,0,0,0)'
@@ -925,7 +925,7 @@ export default class LoginScreen extends Component {
                             onChangeText={(text) => this.setState({pin: text})}
                             placeholder="Pin Code"
                             placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
-                            keyboardType="number-pad"
+                            keyboardType="default"
                             returnKeyType="done"
                             underlineColorAndroid='rgba(0,0,0,0)'
                             value={this.state.pin}

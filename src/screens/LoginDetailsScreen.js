@@ -89,14 +89,10 @@ export default class LoginDetailsScreen extends Component {
                             placeholder="Pin Code"
                             placeholderTextColor={'rgba(255, 255, 255, 0.60)'}
                             autoCapitalize="none"
-                            autoCorrect={true}
-                            keyboardType="number-pad"
+                            keyboardType="default"
                             returnKeyType="done"
-                            blurOnSubmit={false}
-                            enablesReturnKeyAutomatically={true}
                             underlineColorAndroid='rgba(0,0,0,0)'
                             value={this.state.code}
-                            keyboardShouldPersistTaps={'handled'}
                         />
                         <View style={{height: 60, paddingTop: 20}}>
                             <TouchableOpacity style={LoginDetailsScreenStyles.buttonSelect}
