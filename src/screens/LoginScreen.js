@@ -798,10 +798,9 @@ export default class LoginScreen extends Component {
                                     }
                                     else
                                     {
-                                        console.log(r);
                                         Alert.alert(
                                             'Error',
-                                            r._bodyText.split('"message":"')[1].split('"')[0],
+                                            r._bodyText.replace(/\"/g, ''),
                                             [
                                                 {text: 'Ok'},
                                             ],
