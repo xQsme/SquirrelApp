@@ -14,6 +14,7 @@ import logo from '../utils/images/logo.png';
 import sqrl from '../utils/images/sqrl.png';
 import mail from '../utils/images/mail.png';
 import auth from '../utils/images/auth.png';
+import fido from '../utils/images/fido.png';
 import fingerprint from '../utils/images/fingerprint.png';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 
@@ -681,26 +682,12 @@ export default class LoginScreen extends Component {
             }}>
                 <View style={{paddingTop:30, paddingBottom: 30}}>
                     <Image
-                        source={logo}
-                        style={{width: 200, height: 200}}
+                        source={fido}
+                        style={{height: 150, width: 908/440*150}}
                     />
                 </View>
                 <View style={{height: 50}}>
-                    <Icon
-                        ios={'ios-lock'}
-                        android={'md-lock'}
-                        style={LoginScreenStyles.inlineImg}
-                    />
-                    <TextInput
-                        style={LoginScreenStyles.input}
-                        onChangeText={(text) => this.setState({code_2: text})}
-                        placeholder="FIDO Authenticator Code"
-                        placeholderTextColor={'rgba(100, 100, 100, 0.60)'}
-                        keyboardType="number-pad"
-                        returnKeyType="done"
-                        underlineColorAndroid='rgba(0,0,0,0)'
-                        value={this.state.code_2}
-                    />
+                    <Text style={{color: 'black', fontSize: 20}}>Fido Support not available on mobile (yet)</Text>
                 </View>
                 <View style={{height: 50}}>
                     <TouchableOpacity style={LoginScreenStyles.button}
@@ -712,7 +699,7 @@ export default class LoginScreen extends Component {
                             }
                         }}>
                         <Text style={ButtonStyles.text}>
-                        Authenticate
+                        ¯\_(ツ)_/¯
                         </Text>
                     </TouchableOpacity>
                 </View>
