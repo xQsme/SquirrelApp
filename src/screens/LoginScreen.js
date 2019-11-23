@@ -49,6 +49,7 @@ export default class LoginScreen extends Component {
             checkPin: false,
             pinCheck: false,
             setPin: false,
+            requestAuth: false,
         };
 
         AsyncStorageManager.getUserToken()
@@ -189,6 +190,7 @@ export default class LoginScreen extends Component {
                         else
                         {
                             this.setState({
+                                requestAuth: true,
                                 google: JSON.parse(r._bodyText).google,
                                 fido: JSON.parse(r._bodyText).fido,
                                 email_code: JSON.parse(r._bodyText).email_code,
@@ -612,6 +614,42 @@ export default class LoginScreen extends Component {
 
     render2FA()
     {
+        if(this.state.requestAuth)
+        {
+            return(
+                <View style={{flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}>
+                    <Text style={{fontSize: 20}}>You Have MFA activated</Text>
+                    <Text style={{fontSize: 20}}>Select authentication method</Text>
+                    {this.state.google && (
+                        <TouchableOpacity
+                            onPress={() => {
+                                this.setState({ requestAuth: false, email_code: false });
+                             }}>
+                            <View style={{paddingTop:20, paddingBottom: 20}}>
+                                <Image
+                                    source={auth}
+                                    style={{width: 125, height: 125}}
+                                />
+                            </View>
+                        </TouchableOpacity>
+                    )}
+                    {this.state.email_code && (
+                        <TouchableOpacity
+                        onPress={() => { this.setState({ requestAuth: false, google: false }); }}>
+                            <View style={{paddingTop:20, paddingBottom: 20}}>
+                                <Image
+                                    source={mail}
+                                    style={{width: 125, height: 125}}
+                                />
+                            </View>
+                        </TouchableOpacity>
+                    )}
+                </View>
+            );
+        }
         if(this.state.google)
         {
             return(
