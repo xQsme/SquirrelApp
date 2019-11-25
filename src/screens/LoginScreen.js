@@ -190,7 +190,7 @@ export default class LoginScreen extends Component {
                         else
                         {
                             this.setState({
-                                requestAuth: JSON.parse(r._bodyText).google && JSON.parse(r._bodyText).email_code,
+                                requestAuth: JSON.parse(r._bodyText).google || JSON.parse(r._bodyText).email_code,
                                 google: JSON.parse(r._bodyText).google,
                                 fido: !JSON.parse(r._bodyText).google && !JSON.parse(r._bodyText).email_code && JSON.parse(r._bodyText).fido,
                                 email_code: JSON.parse(r._bodyText).email_code,
@@ -724,8 +724,8 @@ export default class LoginScreen extends Component {
                         style={{height: 150, width: 908/440*150}}
                     />
                 </View>
-                <View style={{height: 50, textAlign: 'center'}}>
-                    <Text style={{fontSize: 16}}>Fido Support not available on mobile (yet)</Text>
+                <View style={{height: 50}}>
+                    <Text style={{color: 'black', fontSize: 20}}>Fido Support not available on mobile (yet)</Text>
                 </View>
                 <View style={{height: 50}}>
                     <TouchableOpacity style={LoginScreenStyles.button}
