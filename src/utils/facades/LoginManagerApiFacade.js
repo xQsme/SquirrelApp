@@ -1,5 +1,5 @@
-//const URL_BASE = 'https://www.squirrel-mcif.me/api/';
-const URL_BASE = 'http://192.168.1.88/api/';
+const URL_BASE = 'https://www.squirrel-mcif.me/api/';
+//const URL_BASE = 'http://192.168.1.88:8000/api/';
 /**
  * The URL for the api method to dump the entire database
  * @type {string} - URL
