@@ -190,7 +190,7 @@ export default class LoginScreen extends Component {
                         else
                         {
                             this.setState({
-                                requestAuth: JSON.parse(r._bodyText).google || JSON.parse(r._bodyText).email_code,
+                                requestAuth: JSON.parse(r._bodyText).google && JSON.parse(r._bodyText).email_code,
                                 google: JSON.parse(r._bodyText).google,
                                 fido: !JSON.parse(r._bodyText).google && !JSON.parse(r._bodyText).email_code && JSON.parse(r._bodyText).fido,
                                 email_code: JSON.parse(r._bodyText).email_code,
